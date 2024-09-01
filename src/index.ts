@@ -35,7 +35,7 @@ function assertEnv(type: EnvironmentType): boolean {
     return false;
 }
 
-function getOldTabs() {
+function getTabs() {
     if (typeof chrome !== "undefined") {
         return chrome.tabs;
     }
