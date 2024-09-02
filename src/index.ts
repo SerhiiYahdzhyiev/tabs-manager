@@ -51,7 +51,6 @@ class Tabs {
     private _idToTab = new Map<number, chrome.tabs.Tab>();
     private _tabs: chrome.tabs.Tab[] = []
 
-
     private _asserTabId(tab: chrome.tabs.Tab): boolean {
         if (!tab.id) {
             return false;
@@ -70,8 +69,11 @@ class Tabs {
         this._idToTab.set(tab.id!, tab);
     }
 
-    //@ts-ignore
-    private updateListener = (id,changeInfo,tab) => {
+    private updateListener = (
+        id: number,
+        changeInfo: Record<string, string|number>,
+        tab: chrome.tabs.Tab,
+    ) => {
         let old = this._tabs.find(t => t.id === id)!;
         if (!old) {
             console.warn(id);
