@@ -1,5 +1,10 @@
 "use strict";
 
+const requiredPermissions = [
+    "tabs",
+    "activeTab",
+];
+
 enum EnvironmentType {
     WINDOW="window",
     WORKER="worker",
@@ -47,9 +52,27 @@ function getTabs() {
     return browser?.tabs;
 }
 
+function getRuntime() {
+    if (typeof chrome !== "undefined") {
+        return chrome.runtime;
+    }
+    //@ts-ignore
+    return browser.runtime;
+}
+
 (() => {
     if (!assertEnv(getEnvType())) {
         console.warn("This environment is not suitable for TabsManager!");
+        return 1;
+    }
+
+    const manifestPermissions = getRuntime().getManifest()["permissions"];
+
+    const requiredPermissionsGranted = requiredPermissions
+        .every(permission => manifestPermissions.includes(permission))
+
+    if (!requiredPermissionsGranted) {
+        console.warn("This extension does not have a required permissions for TabsManager!");
         return 1;
     }
 
