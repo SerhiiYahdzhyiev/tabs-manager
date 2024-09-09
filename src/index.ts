@@ -80,7 +80,7 @@ function getRuntime() {
         private _idToTab = new Map<number, chrome.tabs.Tab>();
         private _tabs: chrome.tabs.Tab[] = []
 
-        private _asserTabId(tab: chrome.tabs.Tab): boolean {
+        private _assertTabId(tab: chrome.tabs.Tab): boolean {
             if (!tab.id) {
                 return false;
             }
@@ -89,7 +89,7 @@ function getRuntime() {
 
         private createListener = (tab: chrome.tabs.Tab) => {
             this._tabs = [...this._tabs, tab];
-            if (!this._asserTabId(tab)) {
+            if (!this._assertTabId(tab)) {
                 console.warn("Skipping tab without id!");
                 console.warn("This tab will not be saved in id->tab map!");
                 console.dir(tab);
@@ -109,7 +109,7 @@ function getRuntime() {
                 throw Error("Failed to find updated tab by id!")
             }
             Object.assign(old, changeInfo);
-            if (this._asserTabId(tab)) {
+            if (this._assertTabId(tab)) {
                 this._idToTab.set(id, tab);
             }
         };
