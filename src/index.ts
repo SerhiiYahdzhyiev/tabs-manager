@@ -181,6 +181,30 @@ function ensureClosingSlash(url: string): string {
             return null;
         }
 
+        public hasId(id: number) {
+            return this._idToTab.has(id);
+        }
+
+        public hasUrl(url: string) {
+            return this._urlToId.has(ensureClosingSlash(url));
+        }
+
+        public has(key: string|number): boolean {
+            if (typeof key === "number") {
+                return this._idToTab.has(key);
+            }
+            if (typeof key ==="string") {
+                let a: boolean = false,
+                    b: boolean;
+                if (!isNaN(+key) && +key > 0) {
+                     a = this._idToTab.has(+key);
+                }
+                b = this._urlToId.has(ensureClosingSlash(key));
+                return a || b;
+            }
+            return false;
+        }
+
         constructor() {
             const tabs = getTabs();
             tabs.onCreated.addListener(this.createListener.bind(this));
