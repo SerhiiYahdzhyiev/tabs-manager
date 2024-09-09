@@ -60,6 +60,14 @@ function getRuntime() {
     return browser.runtime;
 }
 
+function ensureClosingSlash(url: string): string {
+    const lastChar = url.split("").toReversed()[0];
+    if (lastChar === "/") {
+        return url;
+    }
+    return url + "/";
+}
+
 (() => {
     if (!assertEnv(getEnvType())) {
         console.warn("This environment is not suitable for TabsManager!");
@@ -149,9 +157,7 @@ function getRuntime() {
         }
 
         public getTabByUrl(url: string): chrome.tabs.Tab | null {
-            const lastChar = url.split("").toReversed()[0];
-            lastChar !== "/" && (url = url + "/");
-            const id = this._urlToId.get(url);
+            const id = this._urlToId.get(ensureClosingSlash(url));
             if (id) return this._idToTab.get(id)!;
             return null;
         }
