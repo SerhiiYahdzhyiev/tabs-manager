@@ -77,11 +77,19 @@ function getRuntime() {
     }
 
     class Tabs {
+        private _urlToId = new Map<string, number>();
         private _idToTab = new Map<number, chrome.tabs.Tab>();
         private _tabs: chrome.tabs.Tab[] = []
 
         private _assertTabId(tab: chrome.tabs.Tab): boolean {
             if (!tab.id) {
+                return false;
+            }
+            return true;
+        }
+
+        private _assertTabUrl(tab: chrome.tabs.Tab): boolean {
+            if (!tab.url && !tab.pendingUrl) {
                 return false;
             }
             return true;
@@ -96,6 +104,13 @@ function getRuntime() {
                 return;
             }
             this._idToTab.set(tab.id!, tab);
+            if (!this._assertTabUrl(tab)) {
+                console.warn("Skipping tab without both url and pendingUrl!");
+                console.warn("This tab will not be saved in url->tab map!");
+                return;
+            }
+            const url: string = (tab.url || tab.pendingUrl)!
+            this._urlToId.set(url, tab.id! );
         }
 
         private updateListener = (
@@ -112,11 +127,21 @@ function getRuntime() {
             if (this._assertTabId(tab)) {
                 this._idToTab.set(id, tab);
             }
+            if (this._assertTabUrl(tab)) {
+                const url: string = (tab.url || tab.pendingUrl)!
+                this._urlToId.set(url, id);
+            }
         };
 
         private removeListener = (id: number) => {
             this._tabs = this._tabs.filter(t => t.id !== id);
             this._idToTab.delete(id);
+            // TODO: Find a more performant way to do this...
+            for (const [k,v] of this._urlToId.entries()) {
+                if (v === id) {
+                    this._urlToId.delete(k);
+                }
+            }
         }
 
         constructor() {
@@ -129,6 +154,8 @@ function getRuntime() {
                 tabs.map(
                     (tab: chrome.tabs.Tab) => {
                         this._idToTab.set(tab.id!, tab);
+                        const url = (tab.url || tab.pendingUrl)!;
+                        this._urlToId.set(url, tab.id!);
                     }
                 );
             });
