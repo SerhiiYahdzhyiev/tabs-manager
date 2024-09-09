@@ -144,6 +144,37 @@ function getRuntime() {
             }
         }
 
+        public getTabById(id: number): chrome.tabs.Tab | null {
+            return this._idToTab.get(id) || null;
+        }
+
+        public getTabByUrl(url: string): chrome.tabs.Tab | null {
+            const lastChar = url.split("").toReversed()[0];
+            lastChar !== "/" && (url = url + "/");
+            const id = this._urlToId.get(url);
+            if (id) return this._idToTab.get(id)!;
+            return null;
+        }
+
+        public getIdBy(url: string): number {
+            return this._urlToId.get(url) || -1;
+        }
+
+        public get(key: string|number): chrome.tabs.Tab | null {
+            if (typeof key === "number") {
+                return this.getTabById(key);
+            }
+            if (typeof key ==="string") {
+                let candidate: chrome.tabs.Tab | null = null;
+                if (!isNaN(+key) && +key > 0) {
+                    candidate = this.getTabById(+key);
+                }
+                if (!candidate) candidate = this.getTabByUrl(key);
+                return candidate;
+            }
+            return null;
+        }
+
         constructor() {
             const tabs = getTabs();
             tabs.onCreated.addListener(this.createListener.bind(this));
