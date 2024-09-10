@@ -224,4 +224,12 @@ function ensureClosingSlash(url: string): string {
     Object.assign(globalThis, {envType: getEnvType()});
     Object.assign(globalThis, {_tabs: new Tabs()});
 
+    class TabsManager {
+        constructor(options: Record<string, any>) {
+            // TODO: Make an actual use of options...
+            console.log(options);
+        }
+    }
+
+    Object.assign(globalThis, { TabsManager: TabsManager});
 })();
