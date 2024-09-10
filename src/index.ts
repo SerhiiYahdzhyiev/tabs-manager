@@ -229,6 +229,15 @@ function ensureClosingSlash(url: string): string {
             // TODO: Make an actual use of options...
             console.log(options);
         }
+
+        public static withTabs<ReturnType>(
+            cb: (tabs: Tabs, ...args: any[]) => ReturnType
+        ): (...args: any[]) => ReturnType {
+            return (...args: any[]) => {
+                //@ts-ignore
+                return cb(_tabs._tabs, ...args);
+            };
+        } 
     }
 
     Object.assign(globalThis, { TabsManager: TabsManager});
