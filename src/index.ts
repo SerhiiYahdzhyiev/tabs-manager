@@ -11,10 +11,6 @@ enum EnvironmentType {
     INVALID="invalid",
 };
 
-// INFO: Globals
-var envType: EnvironmentType;
-var _tabs;
-
 function getEnvType(): EnvironmentType {
     const gThis = String(globalThis);
     if (gThis.match(/worker/ig)) {
@@ -223,7 +219,9 @@ function ensureClosingSlash(url: string): string {
         }
     }
 
+
     // INFO: Globals assignment...
-    envType = getEnvType();
-    _tabs = new Tabs();
+    Object.assign(globalThis, {envType: getEnvType()});
+    Object.assign(globalThis, {_tabs: new Tabs()});
+
 })();
