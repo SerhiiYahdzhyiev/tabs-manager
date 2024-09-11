@@ -219,13 +219,12 @@ function ensureClosingSlash(url: string): string {
             tabs.onUpdated.addListener(this.updateListener.bind(this));
             tabs.onRemoved.addListener(this.removeListener.bind(this));
             tabs.query({}, (tabs: any) => {
-                this._tabs = tabs
-                tabs.map(
-                    (tab: chrome.tabs.Tab) => {
-                        const wrappedTab = new Tab(tab);
-                        this._idToTab.set(tab.id!, wrappedTab);
-                        const url = (wrappedTab.url || wrappedTab.pendingUrl)!;
-                        this._urlToId.set(url, wrappedTab.id!);
+                this._tabs = tabs.map((t: chrome.tabs.Tab)=> new Tab(t));
+                this._tabs.map(
+                    (tab: Tab) => {
+                        this._idToTab.set(tab.id!, tab);
+                        const url = (tab.url || tab.pendingUrl)!;
+                        this._urlToId.set(url, tab.id!);
                     }
                 );
             });
