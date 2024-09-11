@@ -238,7 +238,17 @@ function ensureClosingSlash(url: string): string {
                 return cb(_tabs._tabs, ...args);
             };
         } 
-    }
+
+        public get(key: string|number): chrome.tabs.Tab | null {
+            //@ts-ignore
+            return _tabs.get(key);
+        }
+
+        public has(key: string|number): boolean {
+            //@ts-ignore
+            return _tabs.has(key);
+        }
+     }
 
     Object.assign(globalThis, { TabsManager: TabsManager});
 })();
