@@ -88,6 +88,7 @@ function ensureClosingSlash(url: string): string {
         constructor(tab: chrome.tabs.Tab) {
             Object.assign(this, tab);
         }
+
     }
 
     class Tabs {
@@ -133,18 +134,18 @@ function ensureClosingSlash(url: string): string {
             changeInfo: Record<string, string|number>,
             tab: chrome.tabs.Tab,
         ) => {
-            const wrappedTab = new Tab(tab);
-            let old = this._tabs.find(t => t.id === id)!;
-            if (!old) {
+            if (!this.hasId(id)) {
                 console.warn(id);
                 throw Error("Failed to find updated tab by id!")
             }
-            Object.assign(old, changeInfo);
-            if (this._assertTabId(wrappedTab)) {
-                this._idToTab.set(id, wrappedTab);
+            const _tab = this.getTabById(id)!;
+            if ("url" in changeInfo || "pendingUrl" in changeInfo) {
+                const url = (_tab.url || _tab.pendingUrl)!;
+                this._urlToId.delete(url);
             }
-            if (this._assertTabUrl(wrappedTab)) {
-                const url: string = (wrappedTab.url || wrappedTab.pendingUrl)!
+            Object.assign(_tab, changeInfo);
+            if (this._assertTabUrl(_tab)) {
+                const url: string = (_tab.url || _tab.pendingUrl)!
                 this._urlToId.set(url, id);
             }
         };
