@@ -251,6 +251,17 @@ function ensureClosingSlash(url: string): string {
         constructor(options: Record<string, any>) {
             // TODO: Make an actual use of options...
             console.log(options);
+
+            const browserTabs = getTabs();
+
+            Object.assign(this, {
+                create: browserTabs.create,
+                connect: browserTabs.connect,
+                discard: browserTabs.discard,
+                remove: browserTabs.remove,
+                reload: browserTabs.reload,
+                update: browserTabs.update,
+            });
         }
 
         public static withTabs<ReturnType>(
@@ -260,9 +271,14 @@ function ensureClosingSlash(url: string): string {
                 //@ts-ignore
                 return cb(_tabs._tabs, ...args);
             };
-        } 
+        }
 
-        public get(key: string|number): chrome.tabs.Tab | null {
+        public getAll(): Tab {
+            //@ts-ignore
+            return _tabs._tabs;
+        }
+ 
+        public get(key: string|number): Tab | null {
             //@ts-ignore
             return _tabs.get(key);
         }
