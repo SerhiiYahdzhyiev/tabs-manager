@@ -1,43 +1,10 @@
 "use strict";
 
 import { Tab } from "./tab";
+import { assertEnv, getEnvType } from "./env";
 import { ensureClosingSlash } from "./utils";
 
 const requiredPermissions = ["tabs", "activeTab"];
-
-enum EnvironmentType {
-  WINDOW = "window",
-  WORKER = "worker",
-  INVALID = "invalid",
-}
-
-function getEnvType(): EnvironmentType {
-  const gThis = String(globalThis);
-  if (gThis.match(/worker/gi)) {
-    return EnvironmentType.WORKER;
-  } else if (gThis.match(/window/gi)) {
-    return EnvironmentType.WINDOW;
-  }
-  console.warn("Environment detection failed!");
-  return EnvironmentType.INVALID;
-}
-
-function assertEnv(type: EnvironmentType): boolean {
-  switch (type) {
-    case EnvironmentType.WINDOW:
-      return !!(
-        //@ts-ignore
-        ((browser && browser.tabs) || (chrome && chrome.tabs))
-      );
-    case EnvironmentType.WORKER:
-      return !!(
-        (chrome && chrome.tabs) ||
-        //@ts-ignore
-        (browser && browser.tabs)
-      );
-  }
-  return false;
-}
 
 function getTabs() {
   if (typeof chrome !== "undefined") {
