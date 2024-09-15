@@ -8,7 +8,7 @@
     "transpile": "tsc",
     "bundle": "rollup build/index.js --file dist/tabs-manager.js --format iife",
     "build": "npm-run-all -s clean transpile bundle",
-    "format": "prettier src/",
+    "format": "prettier src/ --write",
     "lint": "eslint src/"
   },
   "keywords": [
