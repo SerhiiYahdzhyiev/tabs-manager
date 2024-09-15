@@ -4,7 +4,9 @@
   "description": "A library for tabs management in browser extensions.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "transpile": "tsc",
+    "bundle": "rollup build/index.js --file dist/tabs-manager.js --format iife",
+    "build": "npm-run-all -s transpile bundle",
     "format": "prettier src/",
     "lint": "eslint src/"
   },
