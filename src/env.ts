@@ -28,3 +28,19 @@ export function assertEnv(type: EnvironmentType): boolean {
   }
   return false;
 }
+
+export function getTabs() {
+  if (typeof chrome !== "undefined") {
+    return chrome.tabs;
+  }
+  //@ts-ignore
+  return browser?.tabs;
+}
+
+export function getRuntime() {
+  if (typeof chrome !== "undefined") {
+    return chrome.runtime;
+  }
+  //@ts-ignore
+  return browser.runtime;
+}

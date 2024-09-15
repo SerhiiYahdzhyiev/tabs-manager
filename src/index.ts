@@ -1,26 +1,10 @@
 "use strict";
 
 import { Tab } from "./tab";
-import { assertEnv, getEnvType } from "./env";
 import { ensureClosingSlash } from "./utils";
+import { assertEnv, getEnvType, getRuntime } from "./env";
 
 const requiredPermissions = ["tabs", "activeTab"];
-
-function getTabs() {
-  if (typeof chrome !== "undefined") {
-    return chrome.tabs;
-  }
-  //@ts-ignore
-  return browser?.tabs;
-}
-
-function getRuntime() {
-  if (typeof chrome !== "undefined") {
-    return chrome.runtime;
-  }
-  //@ts-ignore
-  return browser.runtime;
-}
 
 (() => {
   if (!assertEnv(getEnvType())) {
