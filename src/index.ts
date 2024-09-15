@@ -1,5 +1,7 @@
 "use strict";
 
+import {Tab} from "./tab";
+
 const requiredPermissions = [
     "tabs",
     "activeTab",
@@ -80,26 +82,6 @@ function ensureClosingSlash(url: string): string {
         return 1;
     }
 
-    class Tab {
-        id: number = -1;
-        url: string = "";
-        pendingUrl: string = "";
-        createdAt: number;
-
-        constructor(tab: chrome.tabs.Tab) {
-            Object.assign(this, tab);
-            this.createdAt = Date.now();
-        }
-
-        get uptime(): number {
-            return Date.now() - this.createdAt;
-        }
-
-        get msFromLastAccessed(): number {
-            //@ts-ignore
-            return Date.now() - Math.round(this.lastAccessed);
-        }
-    }
 
     class Tabs {
         private _urlToId = new Map<string, number>();
@@ -213,12 +195,11 @@ function ensureClosingSlash(url: string): string {
                 return this._idToTab.has(key);
             }
             if (typeof key ==="string") {
-                let a: boolean = false,
-                    b: boolean;
+                let a: boolean = false
                 if (!isNaN(+key) && +key > 0) {
                      a = this._idToTab.has(+key);
                 }
-                b = this._urlToId.has(ensureClosingSlash(key));
+                const b = this._urlToId.has(ensureClosingSlash(key));
                 return a || b;
             }
             return false;
