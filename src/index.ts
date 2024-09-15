@@ -1,6 +1,7 @@
 "use strict";
 
 import { Tab } from "./tab";
+import { ensureClosingSlash } from "./utils";
 
 const requiredPermissions = ["tabs", "activeTab"];
 
@@ -52,14 +53,6 @@ function getRuntime() {
   }
   //@ts-ignore
   return browser.runtime;
-}
-
-function ensureClosingSlash(url: string): string {
-  const lastChar = url.split("").toReversed()[0];
-  if (lastChar === "/") {
-    return url;
-  }
-  return url + "/";
 }
 
 (() => {
