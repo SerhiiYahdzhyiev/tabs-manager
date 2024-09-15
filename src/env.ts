@@ -16,8 +16,10 @@ export function assertEnv(type: EnvironmentType): boolean {
     case EnvironmentType.WINDOW:
       return !!(
         //@ts-ignore
-        (globalThis.browser && browser.tabs) ||
-        (globalThis.chrome && chrome.tabs)
+        (
+          (globalThis.browser && browser.tabs) ||
+          (globalThis.chrome && chrome.tabs)
+        )
       );
     case EnvironmentType.WORKER:
       return !!(

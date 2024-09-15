@@ -29,6 +29,5 @@ const requiredPermissions = ["tabs", "activeTab"];
   Object.assign(globalThis, { envType: getEnvType() });
   Object.assign(globalThis, { _tabs: new Tabs() });
 
-
   Object.assign(globalThis, { TabsManager: TabsManager });
 })();

@@ -1,5 +1,5 @@
 import { getTabs } from "./env";
-import {Tab} from "./tab";
+import { Tab } from "./tab";
 import { ensureClosingSlash } from "./utils";
 
 export class Tabs {
@@ -43,7 +43,6 @@ export class Tabs {
   private updateListener = (
     id: number,
     changeInfo: chrome.tabs.TabChangeInfo,
-    tab: chrome.tabs.Tab,
   ) => {
     if (!this.hasId(id)) {
       console.warn(id);
