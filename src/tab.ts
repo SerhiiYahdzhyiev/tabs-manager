@@ -13,7 +13,7 @@ export class Tab {
   }
 
   get urlObj(): URL {
-    return new URL((this.url || this.pendingUrl || ""));
+    return new URL(this.url || this.pendingUrl || "");
   }
 
   get uptime(): number {
