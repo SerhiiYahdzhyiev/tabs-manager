@@ -3,6 +3,7 @@ import { Tab } from "./tab";
 import { ensureClosingSlash } from "./utils";
 
 export class Tabs {
+  private __debug__ = true;
   private _urlToId = new Map<string, number>();
   private _idToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
@@ -19,6 +20,10 @@ export class Tabs {
       return false;
     }
     return true;
+  }
+  
+  private log(...args: any[]) {
+    if (this.__debug__) console.log(...args);
   }
 
   private createListener = (tab: chrome.tabs.Tab) => {
