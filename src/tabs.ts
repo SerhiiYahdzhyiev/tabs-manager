@@ -5,7 +5,7 @@ import { ensureClosingSlash } from "./utils";
 export class Tabs {
   private _urlToId = new Map<string, number>();
   private _idToTab = new Map<number, Tab>();
-  private _tabs: Tab[] = [];
+  protected _tabs: Tab[] = [];
 
   private _assertTabId(tab: Tab): boolean {
     if (!tab.id) {
@@ -135,6 +135,9 @@ export class Tabs {
         const url = (tab.url || tab.pendingUrl)!;
         this._urlToId.set(url, tab.id!);
       });
+    });
+    Object.assign(this, {
+      [Symbol.toStringTag]: `Tabs[${this._tabs.length}]`,
     });
   }
 }

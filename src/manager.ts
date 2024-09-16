@@ -2,10 +2,15 @@ import { getTabs } from "./env";
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
 
+declare var _tabs: Tabs;
+
 export class TabsManager {
+  private _name: string = "default";
+
   constructor(options: Record<string, any>) {
-    // TODO: Make an actual use of options...
-    console.log(options);
+    if (options.name) {
+      this._name = options.name;
+    }
 
     const browserTabs = getTabs();
 
@@ -17,10 +22,14 @@ export class TabsManager {
       reload: browserTabs.reload,
       update: browserTabs.update,
     });
+
+    Object.assign(this, {
+      [Symbol.toStringTag]: `TabsManager ${this._name}`,
+    });
   }
 
   public static withTabs<ReturnType>(
-    cb: (tabs: Tabs, ...args: any[]) => ReturnType,
+    cb: (tabs: Tab[], ...args: any[]) => ReturnType,
   ): (...args: any[]) => ReturnType {
     return (...args: any[]) => {
       //@ts-ignore
@@ -28,7 +37,7 @@ export class TabsManager {
     };
   }
 
-  public getAll(): Tab {
+  public getAll(): Tab[] {
     //@ts-ignore
     return _tabs._tabs;
   }
