@@ -3,7 +3,7 @@ import { Tab } from "./tab";
 import { ensureClosingSlash } from "./utils";
 
 export class Tabs {
-  private __debug__ = true;
+  private __debug__ = false;
   private _urlToId = new Map<string, number>();
   private _idToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
