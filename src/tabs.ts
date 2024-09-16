@@ -27,6 +27,7 @@ export class Tabs {
   }
 
   private createListener = (tab: chrome.tabs.Tab) => {
+    this.log("Created!");
     const wrappedTab = new Tab(tab);
     this._tabs = [...this._tabs, wrappedTab];
     if (!this._assertTabId(wrappedTab)) {
@@ -49,6 +50,7 @@ export class Tabs {
     id: number,
     changeInfo: chrome.tabs.TabChangeInfo,
   ) => {
+    this.log("Updated!");
     if (!this.hasId(id)) {
       console.warn(id);
       throw Error("Failed to find updated tab by id!");
@@ -56,6 +58,7 @@ export class Tabs {
     const _tab = this.getTabById(id)!;
     if ("url" in changeInfo || "pendingUrl" in changeInfo) {
       const url = (_tab.url || _tab.pendingUrl)!;
+      const newHost = new URL(changeInfo.url ?? "").host;
       this._urlToId.delete(url);
     }
     Object.assign(_tab, changeInfo);
@@ -66,6 +69,7 @@ export class Tabs {
   };
 
   private removeListener = (id: number) => {
+    this.log("Removed!");
     this._tabs = this._tabs.filter((t) => t.id !== id);
     this._idToTab.delete(id);
     // TODO: Find a more performant way to do this...
