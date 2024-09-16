@@ -6,6 +6,9 @@ export class Tab {
 
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
+    Object.assign(this, {
+      [Symbol.toStringTag]: `Tab.${this.urlObj.host}`,
+    });
     this.createdAt = Date.now();
   }
 
