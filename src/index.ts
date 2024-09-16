@@ -15,7 +15,7 @@ const requiredPermissions = ["tabs", "activeTab"];
   const manifestPermissions = getRuntime().getManifest()["permissions"];
 
   const requiredPermissionsGranted = requiredPermissions.every((permission) =>
-    manifestPermissions.includes(permission),
+    (manifestPermissions as string[])?.includes(permission),
   );
 
   if (!requiredPermissionsGranted) {

@@ -1,5 +1,10 @@
 import { EnvironmentType } from "./types";
 
+declare var browser: {
+  tabs: typeof chrome.tabs;
+  runtime: typeof chrome.runtime;
+};
+
 export function getEnvType(): EnvironmentType {
   const gThis = String(globalThis);
   if (gThis.match(/worker/gi)) {
@@ -15,18 +20,11 @@ export function assertEnv(type: EnvironmentType): boolean {
   switch (type) {
     case EnvironmentType.WINDOW:
       return !!(
-        (
-          //@ts-ignore
-          (globalThis.browser && browser.tabs) ||
-          (globalThis.chrome && chrome.tabs)
-        )
+        (typeof browser !== "undefined" && browser.tabs) ||
+        (globalThis.chrome && chrome.tabs)
       );
     case EnvironmentType.WORKER:
-      return !!(
-        (chrome && chrome.tabs) ||
-        //@ts-ignore
-        (browser && browser.tabs)
-      );
+      return !!((chrome && chrome.tabs) || (browser && browser.tabs));
   }
   return false;
 }
@@ -35,7 +33,6 @@ export function getTabs() {
   if (typeof chrome !== "undefined") {
     return chrome.tabs;
   }
-  //@ts-ignore
   return browser?.tabs;
 }
 
@@ -43,6 +40,5 @@ export function getRuntime() {
   if (typeof chrome !== "undefined") {
     return chrome.runtime;
   }
-  //@ts-ignore
   return browser.runtime;
 }
