@@ -146,7 +146,7 @@ export class Tabs {
       });
     });
     Object.assign(this, {
-      [Symbol.toStringTag]: `Tabs[${this._tabs.length}]`,
+      [Symbol.toStringTag]: `Tabs`,
     });
   }
 }
