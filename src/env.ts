@@ -1,6 +1,6 @@
 import { EnvironmentType } from "./types";
 
-declare var browser: {
+declare let browser: {
   tabs: typeof chrome.tabs;
   runtime: typeof chrome.runtime;
 };

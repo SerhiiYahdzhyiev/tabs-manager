@@ -2,7 +2,7 @@ import { getTabs } from "./env";
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
 
-declare var _tabs: Tabs;
+declare let _tabs: Tabs;
 
 export class TabsManager {
   private _name: string = "default";
