@@ -12,6 +12,10 @@ export class Tab {
     this.createdAt = Date.now();
   }
 
+  get urlObj(): URL {
+    return new URL(this.url);
+  }
+
   get uptime(): number {
     return Date.now() - this.createdAt;
   }
