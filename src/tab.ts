@@ -7,13 +7,13 @@ export class Tab {
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
     Object.assign(this, {
-      [Symbol.toStringTag]: `Tab.${this.urlObj.host}`,
+      [Symbol.toStringTag]: `Tab.${this.urlObj.host || "broken"}`,
     });
     this.createdAt = Date.now();
   }
 
   get urlObj(): URL {
-    return new URL(this.url);
+    return new URL((this.url || this.pendingUrl || ""));
   }
 
   get uptime(): number {
