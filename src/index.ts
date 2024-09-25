@@ -1,53 +1,33 @@
 "use strict";
 
-enum EnvironmentType {
-    WINDOW="window",
-    WORKER="worker",
-    INVALID="invalid",
-};
+import { Tabs } from "./tabs";
+import { TabsManager } from "./manager";
+import { assertEnv, getEnvType, getRuntime } from "./env";
 
-function getEnvType(): EnvironmentType {
-    const gThis = String(globalThis);
-    if (gThis.match(/worker/ig)) {
-        return EnvironmentType.WORKER
-    } else if (gThis.match(/window/ig)) {
-        return EnvironmentType.WINDOW
-    }
-    console.warn("Environment detection failed!");
-    return EnvironmentType.INVALID
-}
+const requiredPermissions = ["tabs", "activeTab"];
 
-function assertEnv(type: EnvironmentType): boolean {
-    switch(type) {
-        case EnvironmentType.WINDOW:
-            return !!(
-                //@ts-ignore
-                (browser && browser.tabs) ||
-                (chrome && chrome.tabs)
-        );
-        case EnvironmentType.WORKER:
-            return !!(
-                (chrome && chrome.tabs) ||
-                //@ts-ignore
-                (browser && browser.tabs)
-        );
-    }
-    return false;
-}
-
-function getOldTabs() {
-    if (typeof chrome !== "undefined") {
-        return chrome.tabs;
-    }
-    //@ts-ignore
-    return browser?.tabs;
-}
-
-if (!assertEnv(getEnvType())) {
+(() => {
+  if (!assertEnv(getEnvType())) {
     console.warn("This environment is not suitable for TabsManager!");
-}
+    return 1;
+  }
 
-// INFO: Globals
-var envType: EnvironmentType = getEnvType();
-var _oldTabs = getOldTabs();
-// =============
+  const manifestPermissions = getRuntime().getManifest()["permissions"];
+
+  const requiredPermissionsGranted = requiredPermissions.every((permission) =>
+    (manifestPermissions as string[])?.includes(permission),
+  );
+
+  if (!requiredPermissionsGranted) {
+    console.warn(
+      "This extension does not have a required permissions for TabsManager!",
+    );
+    return 1;
+  }
+
+  // INFO: Globals assignment...
+  Object.assign(globalThis, { envType: getEnvType() });
+  Object.assign(globalThis, { _tabs: new Tabs() });
+
+  Object.assign(globalThis, { TabsManager: TabsManager });
+})();
