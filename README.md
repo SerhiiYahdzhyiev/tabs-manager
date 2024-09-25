@@ -171,10 +171,6 @@ manager.remove(123);
 
 This library is licensed under the MIT License. See the LICENSE file for more details.
 
-Certainly! Here’s the additional **Contribution** section for your README:
-
----
-
 ## Contribution
 
 We welcome contributions to improve **TabsManager**! Whether it's a new feature suggestion, performance optimization, bug fix, or documentation improvement, your help is highly appreciated. Here’s how you can get involved:
