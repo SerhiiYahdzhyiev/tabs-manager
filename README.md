@@ -98,19 +98,19 @@ const allTabs = manager.getAll();
 
 #### `manager.get(key)`
 
-Retrieve a specific tab by its ID or URL.
+Retrieve a specific tab by its ID or tabs list by URL.
 
 **Parameters:**
 
-- `key`: The ID or URL of the tab.
+- `key`: The ID or URL of the tab(s).
 
 **Returns:**
 
-- A `Tab` object if found, otherwise `null`.
+- A `Tab` object if found (or list of `Tab` objects), otherwise `null`.
 
 ```javascript
 const tab = manager.get(123); // by ID
-const tabByUrl = manager.get('https://example.com'); // by URL
+const tabsByUrl = manager.get('https://example.com'); // by URL
 ```
 
 #### `manager.has(key)`
