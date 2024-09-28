@@ -1,8 +1,9 @@
 "use strict";
 
+import { assertEnv, getEnvType, getRuntime } from "./env";
+
 import { Tabs } from "./tabs";
 import { TabsManager } from "./manager";
-import { assertEnv, getEnvType, getRuntime } from "./env";
 
 const requiredPermissions = ["tabs", "activeTab"];
 

@@ -1,20 +1,28 @@
 import { getTabs } from "./env";
+
 import { Tab } from "./tab";
 import { TabMaps } from "./tab-maps";
+
 import { ITabMaps, TabsMapOneToMany } from "./types";
-import { ensureClosingSlash } from "./utils";
+
+import {
+  ensureClosingSlash,
+  simpleOneToOneMapUpdater,
+  stringToIdsMapUpdater,
+} from "./utils";
 
 export class Tabs {
   private __debug__ = false;
+  // NOTE: Currently not in use, may by refined/rethinked later...
   private static __mapNames__ = new Set<string>([
     "idToTab",
-    "urlToId",
+    "urlToIds",
     "hostToTab",
   ]);
 
   private __maps__: ITabMaps = new TabMaps();
 
-  private _urlToId = new Map<string, number>();
+  private _urlToIds = new Map<string, number[]>();
   private _idToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
 
@@ -57,7 +65,7 @@ export class Tabs {
     }
 
     const url: string = (wrappedTab.url || wrappedTab.pendingUrl)!;
-    this._urlToId.set(url, wrappedTab.id!);
+    this.__maps__.updateMap("urlToIds", url, wrappedTab.id);
 
     const host = wrappedTab.urlObj.host;
     if (host) {
@@ -70,30 +78,36 @@ export class Tabs {
     changeInfo: chrome.tabs.TabChangeInfo,
   ) => {
     this.log("Updated!");
+    this.log(id, changeInfo);
+
+    const urlChanged = "url" in changeInfo || "pendingUrl" in changeInfo;
+
     if (!this.hasId(id)) {
       console.warn(id);
       throw Error("Failed to find updated tab by id!");
     }
-    const _tab = this.getTabById(id)!;
-    if ("url" in changeInfo || "pendingUrl" in changeInfo) {
-      const url = (_tab.url || _tab.pendingUrl)!;
 
-      const oldHost = _tab.urlObj.host;
+    const tab = this.getTabById(id)!;
+
+    if (urlChanged) {
+      const url: string = (tab.url || tab.pendingUrl)!;
+      // INFO: Remove id from old url entry...
+      this.__maps__.updateMap("urlToIds", url, tab.id);
+
+      const oldHost = tab.urlObj.host;
       const newHost = new URL(changeInfo.url ?? "").host;
 
       if (newHost && newHost !== oldHost) {
-        this.__maps__.updateMap("hostToIds", oldHost, _tab.id!);
-        this.__maps__.updateMap("hostToIds", newHost, _tab.id!);
+        this.__maps__.updateMap("hostToIds", oldHost, tab.id!);
+        this.__maps__.updateMap("hostToIds", newHost, tab.id!);
       }
-
-      this._urlToId.delete(url);
     }
 
-    Object.assign(_tab, changeInfo);
+    Object.assign(tab, changeInfo);
 
-    if (this._assertTabUrl(_tab)) {
-      const url: string = (_tab.url || _tab.pendingUrl)!;
-      this._urlToId.set(url, id);
+    if (urlChanged && this._assertTabUrl(tab)) {
+      const url: string = (tab.url || tab.pendingUrl)!;
+      this.__maps__.updateMap("urlToIds", url, tab.id);
     }
   };
 
@@ -108,11 +122,9 @@ export class Tabs {
 
     this._tabs = this._tabs.filter((t) => t.id !== id);
     this._idToTab.delete(id);
-    // TODO: Find a more performant way to do this...
-    for (const [k, v] of this._urlToId.entries()) {
-      if (v === id) {
-        this._urlToId.delete(k);
-      }
+    const url = (oldTab.url || oldTab.pendingUrl)!;
+    if (this._urlToIds.has(url)) {
+      this.__maps__.updateMap("urlToIds", url, id);
     }
   };
 
@@ -120,26 +132,32 @@ export class Tabs {
     return this._idToTab.get(id) || null;
   }
 
-  public getTabByUrl(url: string): Tab | null {
-    const id = this._urlToId.get(ensureClosingSlash(url));
-    if (id) return this._idToTab.get(id)!;
-    return null;
+  public getTabsByUrl(url: string): Tab[] {
+    const ids = this._urlToIds.get(ensureClosingSlash(url));
+    if (ids && ids.length) {
+      const result: Tab[] = [];
+      for (const id of ids) {
+        result.push(this.getTabById(id)!);
+      }
+      return result;
+    }
+    return [];
   }
 
-  public getIdBy(url: string): number {
-    return this._urlToId.get(url) || -1;
+  public getIdsBy(url: string): number[] {
+    return this._urlToIds.get(url) || [];
   }
 
-  public get(key: string | number): Tab | null {
+  public get(key: string | number): Tab | Tab[] | null {
     if (typeof key === "number") {
       return this.getTabById(key);
     }
     if (typeof key === "string") {
-      let candidate: Tab | null = null;
+      let candidate: Tab | Tab[] | null = null;
       if (!isNaN(+key) && +key > 0) {
         candidate = this.getTabById(+key);
       }
-      if (!candidate) candidate = this.getTabByUrl(key);
+      if (!candidate) candidate = this.getTabsByUrl(key);
       return candidate;
     }
     return null;
@@ -150,7 +168,7 @@ export class Tabs {
   }
 
   public hasUrl(url: string) {
-    return this._urlToId.has(ensureClosingSlash(url));
+    return this._urlToIds.has(ensureClosingSlash(url));
   }
 
   public has(key: string | number): boolean {
@@ -162,7 +180,7 @@ export class Tabs {
       if (!isNaN(+key) && +key > 0) {
         a = this._idToTab.has(+key);
       }
-      const b = this._urlToId.has(ensureClosingSlash(key));
+      const b = this._urlToIds.has(ensureClosingSlash(key));
       return a || b;
     }
     return false;
@@ -179,7 +197,7 @@ export class Tabs {
 
   constructor() {
     this.__maps__.registerMap<number, Tab>("idToTab", this._idToTab);
-    this.__maps__.registerMap<string, number>("urlToId", this._urlToId);
+    this.__maps__.registerMap<string, number[]>("urlToIds", this._urlToIds);
     this.__maps__.registerMap<string, Iterable<number>>(
       "hostToIds",
       this._hostToIds,
@@ -187,58 +205,19 @@ export class Tabs {
 
     this.__maps__.registerUpdater<Map<number, Tab>, number, Tab>(
       "idToTab",
-      (map, key, value) => {
-        if (!value) {
-          map.delete(key);
-          return;
-        }
-        //TODO: Add Extra validations
-        map.set(key, value);
-      },
+      simpleOneToOneMapUpdater,
     );
 
-    this.__maps__.registerUpdater<Map<string, number>, string, number>(
-      "urlToId",
-      (map, key, value) => {
-        if (!value) {
-          map.delete(key);
-          return;
-        }
-        //TODO: Add Extra validations
-        map.set(key, value);
-      },
+    this.__maps__.registerUpdater<Map<string, number[]>, string, number>(
+      "urlToIds",
+      stringToIdsMapUpdater,
     );
 
     this.__maps__.registerUpdater<
       TabsMapOneToMany<string, number>,
       string,
       number
-    >("hostToIds", (map, key, value) => {
-      console.log(map, key, value);
-      if (!value) {
-        console.warn("Invalid id", value);
-        return;
-      }
-
-      if (!map.has(key)) {
-        map.set(key, [value]);
-        return;
-      }
-
-      const ids = map.get(key)!;
-
-      if (ids.includes(value)) {
-        const newIds = ids.filter((i: number) => i !== value);
-        if (!newIds.length) {
-          map.delete(key);
-          return;
-        }
-        map.set(key, newIds);
-        return;
-      }
-      const newIds = [...ids, value];
-      map.set(key, newIds);
-    });
+    >("hostToIds", stringToIdsMapUpdater);
 
     const tabs = getTabs();
 
@@ -257,7 +236,7 @@ export class Tabs {
         if (host) {
           this.__maps__.updateMap("hostToIds", host, tab.id!);
         }
-        this.__maps__.updateMap("urlToId", url, tab.id!);
+        this.__maps__.updateMap("urlToIds", url, tab.id!);
       });
     });
     Object.assign(this, {
