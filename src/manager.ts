@@ -1,4 +1,5 @@
 import { getTabs } from "./env";
+
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
 
@@ -40,7 +41,7 @@ export class TabsManager {
     return _tabs.tabs;
   }
 
-  public get(key: string | number): Tab | null {
+  public get(key: string | number): Tab | Tab[] | null {
     return _tabs.get(key);
   }
 

@@ -6,7 +6,7 @@ export class TabMaps implements ITabMaps {
 
   private _updateMap<K, V>(
     map: TabsMap<K, V>,
-    updater: TabsMapUpdater<TabsMap<K,V>, K, V>,
+    updater: TabsMapUpdater<TabsMap<K, V>, K, V>,
     key: K,
     value: V,
   ) {
