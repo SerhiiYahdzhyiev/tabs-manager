@@ -3,6 +3,7 @@ export class Tab {
   url: string = "";
   pendingUrl: string = "";
   createdAt: number;
+  lastAccessed: number = Date.now();
 
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
@@ -20,8 +21,8 @@ export class Tab {
     return Date.now() - this.createdAt;
   }
 
+  // TODO: Think of better name for this one...
   get msFromLastAccessed(): number {
-    //@ts-ignore
     return Date.now() - Math.round(this.lastAccessed);
   }
 }
