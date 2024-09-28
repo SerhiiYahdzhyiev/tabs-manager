@@ -7,7 +7,7 @@ declare let _tabs: Tabs;
 export class TabsManager {
   private _name: string = "default";
 
-  constructor(options: Record<string, any>) {
+  constructor(options: Record<string, string>) {
     if (options.name) {
       this._name = options.name;
     }
@@ -29,26 +29,22 @@ export class TabsManager {
   }
 
   public static withTabs<ReturnType>(
-    cb: (tabs: Tab[], ...args: any[]) => ReturnType,
-  ): (...args: any[]) => ReturnType {
-    return (...args: any[]) => {
-      //@ts-ignore
-      return cb(_tabs._tabs, ...args);
+    cb: <TArgs>(tabs: Tab[], ...args: TArgs[]) => ReturnType,
+  ): <TArgs>(...args: TArgs[]) => ReturnType {
+    return <TArgs>(...args: TArgs[]) => {
+      return cb(_tabs.tabs, ...args);
     };
   }
 
   public getAll(): Tab[] {
-    //@ts-ignore
-    return _tabs._tabs;
+    return _tabs.tabs;
   }
 
   public get(key: string | number): Tab | null {
-    //@ts-ignore
     return _tabs.get(key);
   }
 
   public has(key: string | number): boolean {
-    //@ts-ignore
     return _tabs.has(key);
   }
 }

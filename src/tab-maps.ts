@@ -1,12 +1,12 @@
 import { ITabMaps, TabsMap, TabsMapUpdater } from "./types";
 
 export class TabMaps implements ITabMaps {
-  private _maps = new Map<string, TabsMap<any, any>>();
-  private _updaters = new Map<string, TabsMapUpdater<any, any, any>>();
+  private _maps = new Map();
+  private _updaters = new Map();
 
   private _updateMap<K, V>(
-    map: TabsMap<any, any>,
-    updater: TabsMapUpdater<any, any, any>,
+    map: TabsMap<K, V>,
+    updater: TabsMapUpdater<TabsMap<K,V>, K, V>,
     key: K,
     value: V,
   ) {

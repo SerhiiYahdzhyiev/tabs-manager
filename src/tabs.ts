@@ -6,6 +6,11 @@ import { ensureClosingSlash } from "./utils";
 
 export class Tabs {
   private __debug__ = false;
+  private static __mapNames__ = new Set<string>([
+    "idToTab",
+    "urlToId",
+    "hostToTab",
+  ]);
 
   private __maps__: ITabMaps = new TabMaps();
 
@@ -29,7 +34,7 @@ export class Tabs {
     return true;
   }
 
-  private log(...args: any[]) {
+  private log(...args: unknown[]) {
     if (this.__debug__) console.log(...args);
   }
 
@@ -258,5 +263,9 @@ export class Tabs {
     Object.assign(this, {
       [Symbol.toStringTag]: `Tabs`,
     });
+  }
+
+  get tabs(): Tab[] {
+    return this._tabs;
   }
 }
