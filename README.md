@@ -27,16 +27,53 @@ This project was create as a part of the assignment from my university. I've imp
 
 ## Installation
 
-Currently I've not worked on convenient way to install it. The only way is to clone this repo, run `build` script from package json. and take the contents of transpiled `dist/index.js` and work with it as you like.
+Download minified file from this repo and add it to your browser extension
+development project.
 
-For example, place the contents in the `tabsManager.js`, and then add it to your extension:
+For example:
 
 ```bash
 /my-extension
 │
-├── /src
-│   └── tabsManager.js
+├── /lib
+│   └── tabs-manager.min.js
 └── manifest.json
+```
+
+*With Service Worker:*
+
+`manifest.json`;
+```json
+{
+    ...
+    "background": {
+        "service_worker": "background.js"
+    },
+    ...
+}
+```
+
+`background.js`:
+```javascript
+importScripts("./lib/tabs-manager.min.js");
+
+// ...
+```
+
+*As Background Page Script:*
+
+`manifest.json`;
+```json
+{
+    ...
+    "background": {
+        "scripts": [
+            "./lib/tabs-manager.min.js",
+            "./background.js"
+        ]
+    },
+    ...
+}
 ```
 
 ## Usage
@@ -54,11 +91,30 @@ To initialize the `TabsManager`, the library must be included in your extension 
 }
 ```
 
-Then, instantiate the `TabsManager`:
+Then, instantiate the `TabsManager` object:
 
 ```javascript
 const manager = new TabsManager({});
 ```
+
+*Note:* You can create as many instances of `TabsManager` as you want, but with current
+capabilities of this object this probably does not make much sense, but I'm working on it.
+In the future you will be able to use managers, like this:
+
+```javascript
+const gitHubTabs = new TabsManager({
+    filters: [
+            {
+                type: "host",
+                value: "github.com"
+            },
+            // ...
+        ]
+    });
+```
+
+The previous example is a draft, if you have any ideas on how to improve the interface or
+extend functionalities, please consider contributing.
 
 *Note*: Construction options/payload currently can be omitted as it is not in use yet...
 
