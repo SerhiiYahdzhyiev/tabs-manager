@@ -37,17 +37,14 @@ export class TabsManager {
   }
 
   public getAll(): Tab[] {
-    //@ts-ignore
-    return _tabs._tabs;
+    return _tabs.tabs;
   }
 
   public get(key: string | number): Tab | null {
-    //@ts-ignore
     return _tabs.get(key);
   }
 
   public has(key: string | number): boolean {
-    //@ts-ignore
     return _tabs.has(key);
   }
 }
