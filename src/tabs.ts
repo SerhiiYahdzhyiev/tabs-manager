@@ -259,4 +259,8 @@ export class Tabs {
       [Symbol.toStringTag]: `Tabs`,
     });
   }
+
+  get tabs(): Tab[] {
+    return this._tabs;
+  }
 }
