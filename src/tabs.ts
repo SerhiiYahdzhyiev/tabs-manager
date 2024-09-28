@@ -6,6 +6,11 @@ import { ensureClosingSlash } from "./utils";
 
 export class Tabs {
   private __debug__ = false;
+  private static __mapNames__ = new Set<string>([
+    "idToTab",
+    "urlToId",
+    "hostToTab",
+  ]);
 
   private __maps__: ITabMaps = new TabMaps();
 
