@@ -29,7 +29,7 @@ export class Tabs {
     return true;
   }
 
-  private log(...args: any[]) {
+  private log(...args: unknown[]) {
     if (this.__debug__) console.log(...args);
   }
 
