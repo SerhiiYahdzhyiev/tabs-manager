@@ -8,18 +8,32 @@ export class Tab {
   createdAt: number;
   lastAccessed: number = Date.now();
   remove: CallableFunction;
+  update: CallableFunction;
 
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
     Object.assign(this, {
       [Symbol.toStringTag]: `Tab.${this.urlObj.host || "broken"}`,
     });
+
     this.createdAt = Date.now();
+
     this.remove = withError(this._remove.bind(this));
+    this.update = withError(this._update.bind(this));
   }
 
   private async _remove() {
     await getTabs().remove(this.id);
+  }
+
+  private async _update(options: chrome.tabs.UpdateProperties) {
+    try {
+      const updated = await getTabs().update(this.id, options);
+      Object.assign(this, updated);
+      return this;
+    } catch (e) {
+      throw e;
+    }
   }
 
   get urlObj(): URL {
