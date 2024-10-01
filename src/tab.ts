@@ -1,9 +1,13 @@
+import { getTabs } from "./env";
+import { withError } from "./utils";
+
 export class Tab {
   id: number = -1;
   url: string = "";
   pendingUrl: string = "";
   createdAt: number;
   lastAccessed: number = Date.now();
+  remove: CallableFunction;
 
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
@@ -11,6 +15,11 @@ export class Tab {
       [Symbol.toStringTag]: `Tab.${this.urlObj.host || "broken"}`,
     });
     this.createdAt = Date.now();
+    this.remove = withError(this._remove.bind(this));
+  }
+
+  private async _remove() {
+    await getTabs().remove(this.id);
   }
 
   get urlObj(): URL {
