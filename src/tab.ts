@@ -10,6 +10,8 @@ export class Tab {
   remove: CallableFunction;
   update: CallableFunction;
 
+  private _removed = false;
+
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
     Object.assign(this, {
@@ -23,7 +25,12 @@ export class Tab {
   }
 
   private async _remove() {
-    await getTabs().remove(this.id);
+    try {
+      await getTabs().remove(this.id);
+      this._removed = true;
+    } catch (e) {
+      throw e;
+    }
   }
 
   private async _update(options: chrome.tabs.UpdateProperties) {
