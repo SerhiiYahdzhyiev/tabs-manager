@@ -13,6 +13,8 @@ export class Tab {
   clearAllInputs: CallableFunction;
   duplicate: CallableFunction;
   getLanguage: CallableFunction;
+  goBack: CallableFunction;
+  goForward: CallableFunction;
   remove: CallableFunction;
   update: CallableFunction;
 
@@ -29,9 +31,27 @@ export class Tab {
     this.connect = withError(this._connect.bind(this));
     this.clearAllInputs = withError(this._clearAllInputs.bind(this));
     this.duplicate = withError(this._duplicate.bind(this));
+    this.goBack = withError(this._goBack.bind(this));
+    this.goForward = withError(this._goForward.bind(this));
     this.getLanguage = withError(this._language.bind(this));
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
+  }
+
+  private async _goForward() {
+    try {
+      await getTabs().goForward(this.id);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  private async _goBack() {
+    try {
+      await getTabs().goBack(this.id);
+    } catch (e) {
+      throw e;
+    }
   }
 
   private async _duplicate() {
