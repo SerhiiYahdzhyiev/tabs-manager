@@ -1,5 +1,6 @@
-import { getTabs } from "./env";
+import { getScripting, getTabs } from "./env";
 import { withError } from "./utils";
+import clearAllInputs from "./scripts/clearAllInputs";
 
 export class Tab {
   id: number = -1;
@@ -9,6 +10,7 @@ export class Tab {
   lastAccessed: number = Date.now();
   remove: CallableFunction;
   update: CallableFunction;
+  clearAllInputs: CallableFunction;
 
   private _removed = false;
 
@@ -22,6 +24,7 @@ export class Tab {
 
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
+    this.clearAllInputs = withError(this._clearAllInputs.bind(this));
   }
 
   private async _remove() {
@@ -38,6 +41,21 @@ export class Tab {
       const updated = await getTabs().update(this.id, options);
       Object.assign(this, updated);
       return this;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  private async _clearAllInputs() {
+    try {
+      const scripting = getScripting();
+      if (!scripting)
+        throw new Error("Scripting is not permitted or/and available!");
+
+      await scripting.executeScript({
+        target: { tabId: this.id },
+        func: clearAllInputs,
+      });
     } catch (e) {
       throw e;
     }
