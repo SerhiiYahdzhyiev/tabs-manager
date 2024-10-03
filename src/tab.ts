@@ -15,6 +15,7 @@ export class Tab {
   getLanguage: CallableFunction;
   goBack: CallableFunction;
   goForward: CallableFunction;
+  reload: CallableFunction;
   remove: CallableFunction;
   update: CallableFunction;
 
@@ -34,10 +35,18 @@ export class Tab {
     this.goBack = withError(this._goBack.bind(this));
     this.goForward = withError(this._goForward.bind(this));
     this.getLanguage = withError(this._language.bind(this));
+    this.reload = withError(this._reload.bind(this));
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
   }
 
+  private async _reload(options: chrome.tabs.ReloadProperties) {
+    try {
+      await getTabs().reload(this.id, options);
+    } catch (e) {
+      throw e;
+    }
+  }
   private async _goForward() {
     try {
       await getTabs().goForward(this.id);
