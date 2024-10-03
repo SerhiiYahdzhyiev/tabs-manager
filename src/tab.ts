@@ -69,8 +69,8 @@ export class Tab {
 
   private async _update(options: chrome.tabs.UpdateProperties) {
     try {
-      const updated = await getTabs().update(this.id, options);
-      Object.assign(this, updated);
+      await getTabs().update(this.id, options);
+      Object.assign(this, options);
       return this;
     } catch (e) {
       throw e;
