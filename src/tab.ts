@@ -11,6 +11,7 @@ export class Tab {
 
   connect: CallableFunction;
   clearAllInputs: CallableFunction;
+  getLanguage: CallableFunction;
   remove: CallableFunction;
   update: CallableFunction;
 
@@ -26,8 +27,17 @@ export class Tab {
 
     this.connect = withError(this._connect.bind(this));
     this.clearAllInputs = withError(this._clearAllInputs.bind(this));
+    this.getLanguage = withError(this._language.bind(this));
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
+  }
+
+  private async _language() {
+    try {
+      return await getTabs().detectLanguage(this.id);
+    } catch (e) {
+      throw e;
+    }
   }
 
   private async _connect(options: chrome.tabs.ConnectInfo) {
