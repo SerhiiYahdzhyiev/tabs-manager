@@ -8,9 +8,11 @@ export class Tab {
   pendingUrl: string = "";
   createdAt: number;
   lastAccessed: number = Date.now();
+
+  connect: CallableFunction;
+  clearAllInputs: CallableFunction;
   remove: CallableFunction;
   update: CallableFunction;
-  clearAllInputs: CallableFunction;
 
   private _removed = false;
 
@@ -22,9 +24,18 @@ export class Tab {
 
     this.createdAt = Date.now();
 
+    this.connect = withError(this._connect.bind(this));
+    this.clearAllInputs = withError(this._clearAllInputs.bind(this));
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
-    this.clearAllInputs = withError(this._clearAllInputs.bind(this));
+  }
+
+  private async _connect(options: chrome.tabs.ConnectInfo) {
+    try {
+      await getTabs().connect(this.id, options);
+    } catch (e) {
+      throw e;
+    }
   }
 
   private async _remove() {
