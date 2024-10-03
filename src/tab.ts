@@ -11,6 +11,7 @@ export class Tab {
 
   connect: CallableFunction;
   clearAllInputs: CallableFunction;
+  duplicate: CallableFunction;
   getLanguage: CallableFunction;
   remove: CallableFunction;
   update: CallableFunction;
@@ -27,9 +28,18 @@ export class Tab {
 
     this.connect = withError(this._connect.bind(this));
     this.clearAllInputs = withError(this._clearAllInputs.bind(this));
+    this.duplicate = withError(this._duplicate.bind(this));
     this.getLanguage = withError(this._language.bind(this));
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
+  }
+
+  private async _duplicate() {
+    try {
+      await getTabs().duplicate(this.id);
+    } catch (e) {
+      throw e;
+    }
   }
 
   private async _language() {
