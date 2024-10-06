@@ -1,18 +1,22 @@
 import { getScripting, getTabs } from "./env";
-import { withError } from "./utils";
+import { sleep, withError } from "./utils";
+
 import clearAllInputs from "./scripts/clearAllInputs";
 
 export class Tab {
   id: number = -1;
+  windowId: number = -1;
   url: string = "";
   pendingUrl: string = "";
   createdAt: number;
   lastAccessed: number = Date.now();
 
+  //TODO: Improve typehints...
   connect: CallableFunction;
   clearAllInputs: CallableFunction;
   duplicate: CallableFunction;
   getLanguage: CallableFunction;
+  getScreenshot: CallableFunction;
   goBack: CallableFunction;
   goForward: CallableFunction;
   move: CallableFunction;
@@ -20,6 +24,7 @@ export class Tab {
   remove: CallableFunction;
   update: CallableFunction;
 
+  // TODO: Make use of this flag...
   private _removed = false;
 
   constructor(tab: chrome.tabs.Tab) {
@@ -36,10 +41,21 @@ export class Tab {
     this.goBack = withError(this._goBack.bind(this));
     this.goForward = withError(this._goForward.bind(this));
     this.getLanguage = withError(this._language.bind(this));
+    this.getScreenshot = withError(this._screenshot.bind(this));
     this.move = withError(this._move.bind(this));
     this.reload = withError(this._reload.bind(this));
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
+  }
+
+  private async _screenshot(options: chrome.tabs.CaptureVisibleTabOptions) {
+    try {
+      await this.update({ active: true });
+      await sleep(1000);
+      return await getTabs().captureVisibleTab(this.windowId, options);
+    } catch (e) {
+      throw e;
+    }
   }
 
   private async _move(options: chrome.tabs.MoveProperties) {
