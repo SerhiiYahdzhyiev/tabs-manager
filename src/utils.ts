@@ -50,3 +50,24 @@ export const stringToIdsMapUpdater: TabsMapUpdater<
   const newIds = [...ids, value];
   map.set(key, newIds);
 };
+
+export function withError(cb: CallableFunction): CallableFunction {
+  return async (...args: unknown[]) => {
+    let error = null;
+    let result;
+    try {
+      result = await cb(...args);
+    } catch (e: unknown) {
+      error = {
+        message: String(e),
+        stack: new Error().stack
+      };
+    } finally {
+      return [error, result];
+    }
+  };
+}
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
