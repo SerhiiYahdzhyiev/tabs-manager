@@ -49,93 +49,52 @@ export class Tab {
   }
 
   private async _screenshot(options: chrome.tabs.CaptureVisibleTabOptions) {
-    try {
       await this.update({ active: true });
       await sleep(1000);
       return await getTabs().captureVisibleTab(this.windowId, options);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _move(options: chrome.tabs.MoveProperties) {
-    try {
       const moved = await getTabs().move(this.id, options);
       Object.assign(this, moved);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _reload(options: chrome.tabs.ReloadProperties) {
-    try {
       await getTabs().reload(this.id, options);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _goForward() {
-    try {
       await getTabs().goForward(this.id);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _goBack() {
-    try {
       await getTabs().goBack(this.id);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _duplicate() {
-    try {
       await getTabs().duplicate(this.id);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _language() {
-    try {
       return await getTabs().detectLanguage(this.id);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _connect(options: chrome.tabs.ConnectInfo) {
-    try {
       await getTabs().connect(this.id, options);
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _remove() {
-    try {
       await getTabs().remove(this.id);
       this._removed = true;
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _update(options: chrome.tabs.UpdateProperties) {
-    try {
       await getTabs().update(this.id, options);
       Object.assign(this, options);
       return this;
-    } catch (e) {
-      throw e;
-    }
   }
 
   private async _clearAllInputs() {
-    try {
       const scripting = getScripting();
       if (!scripting)
         throw new Error("Scripting is not permitted or/and available!");
@@ -144,9 +103,6 @@ export class Tab {
         target: { tabId: this.id },
         func: clearAllInputs,
       });
-    } catch (e) {
-      throw e;
-    }
   }
 
   get urlObj(): URL {
