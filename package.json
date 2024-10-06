@@ -10,6 +10,7 @@
     "bundle": "rollup -c ./rollup.config.js",
     "build": "npm-run-all -s clean transpile bundle",
     "format": "prettier src/ --write",
+    "test": "vitest run __test__",
     "lint": "eslint src/"
   },
   "keywords": [
