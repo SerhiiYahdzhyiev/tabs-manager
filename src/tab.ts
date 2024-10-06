@@ -1,4 +1,5 @@
 export class Tab {
+  active: boolean = false;
   id: number = -1;
   url: string = "";
   pendingUrl: string = "";
