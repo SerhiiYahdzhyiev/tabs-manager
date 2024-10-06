@@ -60,9 +60,8 @@ export function withError(cb: CallableFunction): CallableFunction {
     } catch (e: unknown) {
       error = {
         message: String(e),
+        stack: new Error().stack,
       };
-      //@ts-ignore
-      Error.captureStackTrace(error);
     } finally {
       return [error, result];
     }
