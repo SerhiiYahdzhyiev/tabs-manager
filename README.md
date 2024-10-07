@@ -45,11 +45,9 @@ For example:
 `manifest.json`;
 ```json
 {
-    // ...
     "background": {
         "service_worker": "background.js"
     },
-    // ...
 }
 ```
 
@@ -65,14 +63,12 @@ importScripts("./lib/tabs-manager.min.js");
 `manifest.json`;
 ```json
 {
-    // ...
     "background": {
         "scripts": [
             "./lib/tabs-manager.min.js",
             "./background.js"
         ]
     },
-    // ...
 }
 ```
 
