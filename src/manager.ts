@@ -38,6 +38,13 @@ export class TabsManager {
     };
   }
 
+  public getActive(): Tab | null {
+    if (_tabs.activeId) {
+      return _tabs.get(_tabs.activeId) as Tab;
+    }
+    return null;
+  }
+
   public getAll(): Tab[] {
     return _tabs.tabs;
   }
