@@ -19,6 +19,7 @@ export class TabsManager {
       create: browserTabs.create,
       connect: browserTabs.connect,
       discard: browserTabs.discard,
+      query: browserTabs.query,
       remove: browserTabs.remove,
       reload: browserTabs.reload,
       update: browserTabs.update,
