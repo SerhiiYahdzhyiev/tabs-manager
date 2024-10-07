@@ -191,6 +191,7 @@ const exists = manager.has(123);
     - create
     - connect
     - discard
+    - query
     - remove
     - reload
     - update
