@@ -9,7 +9,7 @@ export class TabsManager {
   private _name: string = "default";
 
   constructor(options: Record<string, string>) {
-    if (options.name) {
+    if (options?.name) {
       this._name = options.name;
     }
 
