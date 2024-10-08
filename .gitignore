@@ -2,3 +2,5 @@ node_modules/
 **.lock
 build/
 dist/
+
+docs/_build
