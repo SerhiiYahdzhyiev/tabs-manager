@@ -63,4 +63,9 @@ export class TabsManager {
   public focus(tab: Tab): void {
     tab.focus();
   }
+
+  public get tabs(): Tab[] {
+    // INFO: Temporary realization, will be changed to respect filters...
+    return _tabs.tabs;
+  }
 }
