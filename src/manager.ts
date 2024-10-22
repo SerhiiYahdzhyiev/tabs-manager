@@ -16,7 +16,10 @@ export class TabsManager {
     const browserTabs = getTabs();
 
     Object.assign(this, {
-      create: browserTabs.create,
+      create: async (...args: [chrome.tabs.CreateProperties]) =>
+        new Tab(
+          (await browserTabs.create(...args)) as unknown as chrome.tabs.Tab,
+        ),
       connect: browserTabs.connect,
       discard: browserTabs.discard,
       remove: browserTabs.remove,
