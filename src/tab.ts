@@ -51,7 +51,7 @@ export class Tab {
   }
 
   public async focus(): Promise<void> {
-    await this.update(this.id, { active: true });
+    await this._update({ active: true });
     return;
   }
 
