@@ -3,6 +3,7 @@ import { EnvironmentType } from "./types";
 declare let browser: {
   tabs: typeof chrome.tabs;
   runtime: typeof chrome.runtime;
+  scripting: typeof chrome.scripting;
 };
 
 export function getEnvType(): EnvironmentType {
@@ -41,4 +42,15 @@ export function getRuntime() {
     return chrome.runtime;
   }
   return browser.runtime;
+}
+
+export function getScripting() {
+  if (!getRuntime().getManifest().permissions?.includes("scripting")) {
+    console.warn("This runtime doesn't have required optional permission!");
+    return null;
+  }
+  if (typeof chrome !== "undefined") {
+    return chrome.scripting;
+  }
+  return browser.scripting;
 }

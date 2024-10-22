@@ -16,7 +16,10 @@ export class TabsManager {
     const browserTabs = getTabs();
 
     Object.assign(this, {
-      create: browserTabs.create,
+      create: async (...args: [chrome.tabs.CreateProperties]) =>
+        new Tab(
+          (await browserTabs.create(...args)) as unknown as chrome.tabs.Tab,
+        ),
       connect: browserTabs.connect,
       discard: browserTabs.discard,
       query: browserTabs.query,
@@ -55,5 +58,9 @@ export class TabsManager {
 
   public has(key: string | number): boolean {
     return _tabs.has(key);
+  }
+
+  public focus(tab: Tab): void {
+    tab.focus();
   }
 }
