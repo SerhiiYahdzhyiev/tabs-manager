@@ -13,6 +13,7 @@ import {
 
 export class Tabs {
   private __debug__ = false;
+  private _activeId = 0;
   // NOTE: Currently not in use, may by refined/rethinked later...
   private static __mapNames__ = new Set<string>([
     "idToTab",
@@ -186,6 +187,19 @@ export class Tabs {
     return false;
   }
 
+  private async activatedListener(info: chrome.tabs.TabActiveInfo) {
+    if (this._activeId && this._activeId !== info.tabId) {
+      const tab = this.get(this._activeId) as Tab;
+      if (tab) tab.active = false;
+    }
+    const window = await chrome.windows.get(info.windowId);
+    if (window.focused) {
+      this._activeId = info.tabId;
+      const tab = this.get(info.tabId) as Tab;
+      tab.active = true;
+    }
+  }
+
   private mainListener() {
     for (const [k, ids] of this._hostToIds.entries()) {
       if (!ids.length) {
@@ -226,10 +240,14 @@ export class Tabs {
     tabs.onCreated.addListener(this.createListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
     tabs.onRemoved.addListener(this.removeListener.bind(this));
+    tabs.onActivated.addListener(this.activatedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
       this._tabs = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
       this._tabs.forEach((tab: Tab) => {
+        if (tab.active) {
+          this._activeId = tab.id;
+        }
         this._idToTab.set(tab.id!, tab);
         const url = (tab.url || tab.pendingUrl)!;
         const host = new URL(url).host;
@@ -246,5 +264,12 @@ export class Tabs {
 
   get tabs(): Tab[] {
     return this._tabs;
+  }
+
+  get activeId(): number {
+    if (this._activeId) {
+      return this._activeId;
+    }
+    return 0;
   }
 }

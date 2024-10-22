@@ -22,6 +22,7 @@ export class TabsManager {
         ),
       connect: browserTabs.connect,
       discard: browserTabs.discard,
+      query: browserTabs.query,
       remove: browserTabs.remove,
       reload: browserTabs.reload,
       update: browserTabs.update,
@@ -38,6 +39,13 @@ export class TabsManager {
     return <TArgs>(...args: TArgs[]) => {
       return cb(_tabs.tabs, ...args);
     };
+  }
+
+  public getActive(): Tab | null {
+    if (_tabs.activeId) {
+      return _tabs.get(_tabs.activeId) as Tab;
+    }
+    return null;
   }
 
   public getAll(): Tab[] {

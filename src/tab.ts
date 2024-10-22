@@ -4,6 +4,7 @@ import { sleep, withError } from "./utils";
 import clearAllInputs from "./scripts/clearAllInputs";
 
 export class Tab {
+  active: boolean = false;
   id: number = -1;
   windowId: number = -1;
   url: string = "";
