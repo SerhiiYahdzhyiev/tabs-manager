@@ -48,4 +48,8 @@ export class TabsManager {
   public has(key: string | number): boolean {
     return _tabs.has(key);
   }
+
+  public focus(tab: Tab): void {
+    tab.focus();
+  }
 }

@@ -46,63 +46,69 @@ export class Tab {
     this.reload = withError(this._reload.bind(this));
     this.remove = withError(this._remove.bind(this));
     this.update = withError(this._update.bind(this));
+    this.focus = this.focus.bind(this);
+  }
+
+  public async focus(): Promise<void> {
+    await this.update(this.id, { active: true });
+    return;
   }
 
   private async _screenshot(options: chrome.tabs.CaptureVisibleTabOptions) {
-      await this.update({ active: true });
-      await sleep(1000);
-      return await getTabs().captureVisibleTab(this.windowId, options);
+    await this.update({ active: true });
+    await sleep(1000);
+    return await getTabs().captureVisibleTab(this.windowId, options);
   }
 
   private async _move(options: chrome.tabs.MoveProperties) {
-      const moved = await getTabs().move(this.id, options);
-      Object.assign(this, moved);
+    const moved = await getTabs().move(this.id, options);
+    Object.assign(this, moved);
   }
 
   private async _reload(options: chrome.tabs.ReloadProperties) {
-      await getTabs().reload(this.id, options);
+    await getTabs().reload(this.id, options);
   }
 
   private async _goForward() {
-      await getTabs().goForward(this.id);
+    await getTabs().goForward(this.id);
   }
 
   private async _goBack() {
-      await getTabs().goBack(this.id);
+    await getTabs().goBack(this.id);
   }
 
   private async _duplicate() {
-      await getTabs().duplicate(this.id);
+    await getTabs().duplicate(this.id);
   }
 
   private async _language() {
-      return await getTabs().detectLanguage(this.id);
+    return await getTabs().detectLanguage(this.id);
   }
 
   private async _connect(options: chrome.tabs.ConnectInfo) {
-      await getTabs().connect(this.id, options);
+    await getTabs().connect(this.id, options);
   }
 
   private async _remove() {
-      await getTabs().remove(this.id);
-      this._removed = true;
+    await getTabs().remove(this.id);
+    this._removed = true;
   }
 
   private async _update(options: chrome.tabs.UpdateProperties) {
-      await getTabs().update(this.id, options);
-      Object.assign(this, options);
-      return this;
+    await getTabs().update(this.id, options);
+    Object.assign(this, options);
+    return this;
   }
 
   private async _clearAllInputs() {
-      const scripting = getScripting();
-      if (!scripting)
-        throw new Error("Scripting is not permitted or/and available!");
+    const scripting = getScripting();
+    if (!scripting)
+      throw new Error("Scripting is not permitted or/and available!");
 
-      await scripting.executeScript({
-        target: { tabId: this.id },
-        func: clearAllInputs,
-      });
+    await scripting.executeScript({
+      target: { tabId: this.id },
+      func: clearAllInputs,
+    });
   }
 
   get urlObj(): URL {
