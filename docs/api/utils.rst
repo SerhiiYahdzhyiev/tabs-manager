@@ -1,4 +1,4 @@
-Environment
-===========
+Utils
+=====
 
 .. autofunction:: ensureClosingSlash
