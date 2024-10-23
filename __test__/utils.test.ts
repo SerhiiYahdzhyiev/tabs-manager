@@ -132,36 +132,36 @@ describe("withError", () => {
     expect(func).toBeInstanceOf(Function);
   });
 
-  test("returned callable function returns a tuple", () => {
+  test("returned callable function returns a tuple", async () => {
     const cb = (a, b) => {
       return a + b;
     }
 
     const func = withError(cb);
 
-    expect(() => func(2, 2)).toBeInstanceOf(Array);
-    expect((() => func(2, 2)).length).toBe(2);
+    expect(await func(2, 2)).toBeInstanceOf(Array);
+    await expect((await func(2, 2)).length).toBe(2);
   });
 
-  test("returned callable function returns error null if wrapped function executes with no errors", () => {
-    const res = withError((a,b) => a + b)(2, 2);
+  test("returned callable function returns error null if wrapped function executes with no errors", async () => {
+    const res = await withError((a,b) => a + b)(2, 2);
 
     expect(res).toBeInstanceOf(Array);
     expect(res.length).toBe(2);
     expect(res[0]).toBe(null);
   });
 
-  test("returned callable function returns error if wrapped function throws", () => {
-    const res = withError(() => {throw new TypeError("42")})();
+  test("returned callable function returns error if wrapped function throws", async () => {
+    const res = await withError(() => {throw new TypeError("42")})();
 
     expect(res).toBeInstanceOf(Array);
     expect(res.length).toBe(2);
     expect(res[0]).not.toBe(null);
-    expect(res[0]).toBeInstanceOf(Error);
-    expect(String(res[0])).toBe("42");
+    expect(res[0]).toBeInstanceOf(Object);
+    expect(String(res[0].message)).toBe("TypeError: 42");
   });
-  test("returned callable function returns result if wrapped function returns something", () => {
-    const res = withError((a,b) => a + b)(2, 2);
+  test("returned callable function returns result if wrapped function returns something", async () => {
+    const res = await withError((a,b) => a + b)(2, 2);
 
     expect(res).toBeInstanceOf(Array);
     expect(res.length).toBe(2);

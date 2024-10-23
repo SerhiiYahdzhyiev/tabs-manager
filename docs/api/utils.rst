@@ -6,3 +6,5 @@ Utils
 .. autofunction:: simpleOneToOneMapUpdater
 
 .. autofunction:: stringToIdsMapUpdater
+
+.. autofunction:: withError
