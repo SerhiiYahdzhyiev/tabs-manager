@@ -38,11 +38,11 @@ export function simpleOneToOneMapUpdater<MapType, K, V>(
   key: K,
   value: V,
 ): void {
+  if (!map || !(map instanceof Map)) throw Error("Invalid input: " + map);
   if (!value) {
     (map as Map<K, V>).delete(key);
     return;
   }
-  //TODO: Add Extra validations
   (map as Map<K, V>).set(key, value);
 }
 
