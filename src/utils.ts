@@ -17,11 +17,27 @@ export function ensureClosingSlash(url: string): string {
   return url + "/";
 }
 
+/**
+ * Update simple one-to-one map.
+ *
+ * Will set the value if it is not in the map.
+ * Will overwrite the value with a new one if provided.
+ * Will remove value if provided null as value.
+ *
+ * @param {Map} map - a map to update.
+ * @param {any} key - a key to update
+ * @param {any|null} value - new value or null (to remove a value with 
+ * provided key)
+ *
+ * @return undefined
+ * @throws {Error} On invalid input, if map is anything except Map instance.
+ * @function
+ */
 export function simpleOneToOneMapUpdater<MapType, K, V>(
   map: MapType,
   key: K,
   value: V,
-) {
+): void {
   if (!value) {
     (map as Map<K, V>).delete(key);
     return;
