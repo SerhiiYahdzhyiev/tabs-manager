@@ -6,6 +6,11 @@ declare let browser: {
   scripting: typeof chrome.scripting;
 };
 
+/**
+ * Return the type of environment.
+ *
+ * @returns {EnvironmentType} "worker" | "window" | "invalid"
+ */
 export function getEnvType(): EnvironmentType {
   const gThis = String(globalThis);
   if (gThis.match(/worker/gi)) {

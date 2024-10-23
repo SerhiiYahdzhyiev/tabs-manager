@@ -1,3 +1,4 @@
+import { IVersionable } from "./interfaces";
 import { getTabs } from "./env";
 
 import { Tabs } from "./tabs";
@@ -5,12 +6,26 @@ import { Tab } from "./tab";
 
 declare let _tabs: Tabs;
 
-export class TabsManager {
+export class TabsManager implements IVersionable {
+  // TODO: Realize version insertion from build system
+  //       in a format of a hex digit.
+  private static __version__ = "0.1.0";
+
+  public static get version(): string {
+    return this.__version__;
+  }
+
+  get version(): string {
+    return TabsManager.version;
+  }
   private _name: string = "default";
 
   constructor(options: Record<string, string>) {
     if (options?.name) {
       this._name = options.name;
+
+      (this as { version: string }).version = TabsManager.version;
+      Object.setPrototypeOf(this, TabsManager.prototype);
     }
 
     const browserTabs = getTabs();
