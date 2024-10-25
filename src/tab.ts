@@ -25,7 +25,6 @@ export class Tab {
   remove: CallableFunction;
   update: CallableFunction;
 
-  // TODO: Make use of this flag...
   private _removed = false;
 
   private _withRemoved(cb: CallableFunction) {
@@ -46,7 +45,7 @@ export class Tab {
 
     this.createdAt = Date.now();
 
-    this.connect = withError(this._connect.bind(this));
+    this.connect = this._withRemoved(withError(this._connect.bind(this)));
     this.clearAllInputs = withError(this._clearAllInputs.bind(this));
     this.duplicate = withError(this._duplicate.bind(this));
     this.goBack = withError(this._goBack.bind(this));
@@ -55,7 +54,7 @@ export class Tab {
     this.getScreenshot = withError(this._screenshot.bind(this));
     this.move = withError(this._move.bind(this));
     this.reload = withError(this._reload.bind(this));
-    this.remove = withError(this._remove.bind(this));
+    this.remove = this._withRemoved(withError(this._remove.bind(this)));
     this.update = withError(this._update.bind(this));
     this.focus = this.focus.bind(this);
   }
