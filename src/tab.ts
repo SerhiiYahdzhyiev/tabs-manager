@@ -91,8 +91,8 @@ export class Tab {
   }
 
   private async _remove() {
-    await getTabs().remove(this.id);
     this._removed = true;
+    await getTabs().remove(this.id);
   }
 
   private async _update(options: chrome.tabs.UpdateProperties) {
