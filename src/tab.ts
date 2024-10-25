@@ -28,6 +28,16 @@ export class Tab {
   // TODO: Make use of this flag...
   private _removed = false;
 
+  private _withRemoved(cb: CallableFunction) {
+    return (...args: unknown[]) => {
+      if (this._removed) {
+        console.warn("Cannot use operation on closed tab!");
+        return null;
+      }
+      return cb(...args);
+    };
+  }
+
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
     Object.assign(this, {
