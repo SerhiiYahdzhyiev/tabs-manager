@@ -116,6 +116,12 @@ export class Tabs {
     this.log("Removed!");
     const oldTab = this.getTabById(id)!;
 
+    if (oldTab.active) {
+      getTabs().query({}, (tabs) => {
+        getTabs().update(tabs[tabs.length - 1].id!, { active: true });
+      });
+    }
+
     const host = oldTab?.urlObj.host;
     if (this._hostToIds.has(host)) {
       this.__maps__.updateMap("hostToIds", host, id);
