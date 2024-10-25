@@ -31,10 +31,12 @@ export class TabsManager implements IVersionable {
     const browserTabs = getTabs();
 
     Object.assign(this, {
-      create: async (...args: [chrome.tabs.CreateProperties]) =>
-        new Tab(
-          (await browserTabs.create(...args)) as unknown as chrome.tabs.Tab,
-        ),
+      create: async (...args: [chrome.tabs.CreateProperties]) => {
+        await browserTabs.create(...args);
+        //TODO: Replace with sleep...
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        return _tabs.tabs[_tabs.tabs.length - 1];
+      },
       connect: browserTabs.connect,
       discard: browserTabs.discard,
       query: browserTabs.query,
