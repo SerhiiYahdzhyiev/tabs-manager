@@ -191,14 +191,16 @@ export class Tabs {
     this.log("Activating...");
     if (this._activeId && this._activeId !== info.tabId) {
       const tab = this.get(this._activeId) as Tab;
-      if (tab) tab.active = false;
+      if (tab) {
+        this._tabs[tab.index].active = tab.active = false;
+      }
     }
-    const window = await chrome.windows.get(info.windowId);
-    if (window.focused) {
-      this._activeId = info.tabId;
-      const tab = this.get(info.tabId) as Tab;
-      tab.active = true;
-    }
+    this._activeId = info.tabId;
+    // const window = await chrome.windows.get(info.windowId);
+    // if (window.focused) {
+    const tab = this.get(info.tabId) as Tab;
+    if (tab) this._tabs[tab.index].active = tab.active = true;
+    // }
   }
 
   private mainListener() {
