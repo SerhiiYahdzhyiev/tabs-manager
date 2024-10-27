@@ -1,7 +1,8 @@
 import { TabsMapUpdater } from "./types";
 
 export function ensureClosingSlash(url: string): string {
-  if (!url.trim()) throw new Error("url input cannot be empty");
+  if (typeof url == "string" && !url.trim())
+    throw new Error("Invalid input:" + url);
 
   const lastChar = url.split("").toReversed()[0];
   if (lastChar === "/") {
