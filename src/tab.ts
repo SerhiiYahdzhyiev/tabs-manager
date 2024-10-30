@@ -1,4 +1,4 @@
-import { getScripting, getTabs } from "./env";
+import { getScripting, getTabs, getDebugger } from "./env";
 import { sleep, withError } from "./utils";
 
 import clearAllInputs from "./scripts/clearAllInputs";
@@ -48,18 +48,26 @@ export class Tab {
     this.createdAt = Date.now();
 
     this.connect = this._withRemoved(withError(this._connect.bind(this)));
-    this.clearAllInputs = withError(this._clearAllInputs.bind(this));
-    this.discard = withError(this._discard.bind(this));
-    this.duplicate = withError(this._duplicate.bind(this));
-    this.goBack = withError(this._goBack.bind(this));
-    this.goForward = withError(this._goForward.bind(this));
-    this.getLanguage = withError(this._language.bind(this));
-    this.getScreenshot = withError(this._screenshot.bind(this));
-    this.move = withError(this._move.bind(this));
-    this.reload = withError(this._reload.bind(this));
-    this.remove = this._withRemoved(withError(this._remove.bind(this)));
-    this.update = withError(this._update.bind(this));
-    this.focus = this.focus.bind(this);
+    this.clearAllInputs = this._withRemoved(
+      withError(this._clearAllInputs.bind(this)),
+    );
+    this.discard = this._withRemoved(withError(this._discard.bind(this)));
+    this.duplicate = this._withRemoved(withError(this._duplicate.bind(this)));
+    this.goBack = this._withRemoved(withError(this._goBack.bind(this)));
+    this.goForward = this._withRemoved(withError(this._goForward.bind(this)));
+    this.getLanguage = this._withRemoved(withError(this._language.bind(this)));
+    this.getScreenshot = this._withRemoved(
+      withError(this._screenshot.bind(this)),
+    );
+    this.move = this._withRemoved(withError(this._move.bind(this)));
+    this.reload = this._withRemoved(withError(this._reload.bind(this)));
+    this.remove = this._withRemoved(
+      this._withRemoved(withError(this._remove.bind(this))),
+    );
+    this.update = this._withRemoved(withError(this._update.bind(this)));
+
+    this.focus = this._withRemoved(withError(this.focus.bind(this)));
+    this.forceClose = this._withRemoved(withError(this.forceClose.bind(this)));
   }
 
   private async _discard(): Promise<Tab> {
@@ -131,6 +139,22 @@ export class Tab {
       target: { tabId: this.id },
       func: clearAllInputs,
     });
+  }
+
+  public async forceClose(): Promise<void> {
+    const deb = getDebugger();
+    if (!deb) throw new Error("Debugger is not permitted or/and available!");
+
+    try {
+      await deb.attach({ tabId: this.id }, "1.3");
+    } catch (e) {
+      console.warn(e);
+    }
+    await deb.sendCommand({ tabId: this.id }, "Page.navigate", {
+      url: "about:blank",
+    });
+    await deb.detach({ tabId: this.id });
+    await this.remove();
   }
 
   get urlObj(): URL {
