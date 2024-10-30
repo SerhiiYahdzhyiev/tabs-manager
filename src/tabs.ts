@@ -196,6 +196,7 @@ export class Tabs {
       }
     }
     this._activeId = info.tabId;
+    // TODO: Add ability to configure this behaviour
     // const window = await chrome.windows.get(info.windowId);
     // if (window.focused) {
     const tab = this.get(info.tabId) as Tab;
@@ -267,6 +268,14 @@ export class Tabs {
 
   get tabs(): Tab[] {
     return this._tabs;
+  }
+
+  get last(): Tab {
+    return this._tabs[this._tabs.length - 1];
+  }
+
+  get first(): Tab {
+    return this._tabs[0];
   }
 
   get activeId(): number {
