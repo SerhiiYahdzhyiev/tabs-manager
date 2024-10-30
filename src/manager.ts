@@ -85,4 +85,18 @@ export class TabsManager implements IVersionable {
     // INFO: Temporary realization, will be changed to respect filters...
     return _tabs.tabs;
   }
+
+  public get first(): Tab {
+    // WARN: This is temporary solution
+    // TODO: Replace with first element of fileterd tabs list of current
+    //       manager.
+    return _tabs.first;
+  }
+
+  public get last(): Tab {
+    // WARN: This is temporary solution
+    // TODO: Replace with first element of fileterd tabs list of current
+    //       manager.
+    return _tabs.last;
+  }
 }
