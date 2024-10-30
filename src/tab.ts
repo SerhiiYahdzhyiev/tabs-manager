@@ -16,6 +16,7 @@ export class Tab {
   //TODO: Improve typehints...
   connect: CallableFunction;
   clearAllInputs: CallableFunction;
+  discard: CallableFunction;
   duplicate: CallableFunction;
   getLanguage: CallableFunction;
   getScreenshot: CallableFunction;
@@ -48,6 +49,7 @@ export class Tab {
 
     this.connect = this._withRemoved(withError(this._connect.bind(this)));
     this.clearAllInputs = withError(this._clearAllInputs.bind(this));
+    this.discard = withError(this._discard.bind(this));
     this.duplicate = withError(this._duplicate.bind(this));
     this.goBack = withError(this._goBack.bind(this));
     this.goForward = withError(this._goForward.bind(this));
@@ -58,6 +60,12 @@ export class Tab {
     this.remove = this._withRemoved(withError(this._remove.bind(this)));
     this.update = withError(this._update.bind(this));
     this.focus = this.focus.bind(this);
+  }
+
+  private async _discard(): Promise<Tab> {
+    const rawTab = await getTabs().discard(this.id);
+    Object.assign(this, rawTab);
+    return this;
   }
 
   public async focus(): Promise<void> {
@@ -71,47 +79,49 @@ export class Tab {
     return await getTabs().captureVisibleTab(this.windowId, options);
   }
 
-  private async _move(options: chrome.tabs.MoveProperties) {
+  private async _move(options: chrome.tabs.MoveProperties): Promise<Tab> {
     const moved = await getTabs().move(this.id, options);
     Object.assign(this, moved);
   }
 
-  private async _reload(options: chrome.tabs.ReloadProperties) {
+  private async _reload(options: chrome.tabs.ReloadProperties): Promise<void> {
     await getTabs().reload(this.id, options);
   }
 
-  private async _goForward() {
+  private async _goForward(): Promise<void> {
     await getTabs().goForward(this.id);
   }
 
-  private async _goBack() {
+  private async _goBack(): Promise<void> {
     await getTabs().goBack(this.id);
   }
 
-  private async _duplicate() {
+  private async _duplicate(): Promise<void> {
+    // TODO: Figure out how to handle returned tab here...
     await getTabs().duplicate(this.id);
   }
 
-  private async _language() {
+  private async _language(): Promise<string> {
     return await getTabs().detectLanguage(this.id);
   }
 
   private async _connect(options: chrome.tabs.ConnectInfo) {
-    await getTabs().connect(this.id, options);
+    // TODO: Figure out how to handle returned port here...
+    getTabs().connect(this.id, options);
   }
 
-  private async _remove() {
+  private async _remove(): Promise<void> {
     this._removed = true;
     await getTabs().remove(this.id);
   }
 
-  private async _update(options: chrome.tabs.UpdateProperties) {
+  private async _update(options: chrome.tabs.UpdateProperties): Promise<Tab> {
     await getTabs().update(this.id, options);
     Object.assign(this, options);
     return this;
   }
 
-  private async _clearAllInputs() {
+  private async _clearAllInputs(): Promise<void> {
     const scripting = getScripting();
     if (!scripting)
       throw new Error("Scripting is not permitted or/and available!");
