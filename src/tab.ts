@@ -82,6 +82,7 @@ export class Tab {
   private async _move(options: chrome.tabs.MoveProperties): Promise<Tab> {
     const moved = await getTabs().move(this.id, options);
     Object.assign(this, moved);
+    return this;
   }
 
   private async _reload(options: chrome.tabs.ReloadProperties): Promise<void> {
