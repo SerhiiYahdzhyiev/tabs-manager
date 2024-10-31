@@ -4,6 +4,8 @@ import { getTabs } from "./env";
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
 
+import { sleep } from "./utils";
+
 declare let _tabs: Tabs;
 
 export class TabsManager implements IVersionable {
@@ -33,8 +35,7 @@ export class TabsManager implements IVersionable {
     Object.assign(this, {
       create: async (...args: [chrome.tabs.CreateProperties]) => {
         await browserTabs.create(...args);
-        // TODO: Replace with sleep...
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await sleep(200);
         return _tabs.tabs[_tabs.tabs.length - 1];
       },
       connect: browserTabs.connect,
