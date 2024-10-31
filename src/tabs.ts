@@ -81,9 +81,14 @@ export class Tabs {
     this.log("Updated!");
     this.log(id, changeInfo);
 
+    const discarded =
+      "discarded" in changeInfo && changeInfo.discarded === true;
+
+    if (discarded) return;
+
     const urlChanged = "url" in changeInfo || "pendingUrl" in changeInfo;
 
-    if (!this.hasId(id)) {
+    if (!this.hasId(id) && !discarded) {
       console.warn(id);
       throw Error("Failed to find updated tab by id!");
     }
@@ -213,6 +218,17 @@ export class Tabs {
     }
   }
 
+  public discard(oldId: number, newId: number) {
+    // TODO: Refactor?..
+    const tab = this._idToTab.get(oldId)!;
+    this._idToTab.delete(oldId);
+    this._idToTab.set(newId, tab);
+    this.__maps__.updateMap("urlToIds", tab.url, oldId);
+    this.__maps__.updateMap("urlToIds", tab.url, newId);
+    this.__maps__.updateMap("hostToIds", tab.urlObj.host, oldId);
+    this.__maps__.updateMap("hostToIds", tab.urlObj.host, newId);
+  }
+
   constructor() {
     this.__maps__.registerMap<number, Tab>("idToTab", this._idToTab);
     this.__maps__.registerMap<string, number[]>("urlToIds", this._urlToIds);
@@ -239,12 +255,12 @@ export class Tabs {
 
     const tabs = getTabs();
 
+    tabs.onActivated.addListener(this.activatedListener.bind(this));
     tabs.onUpdated.addListener(this.mainListener.bind(this));
     tabs.onRemoved.addListener(this.mainListener.bind(this));
     tabs.onCreated.addListener(this.createListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
     tabs.onRemoved.addListener(this.removeListener.bind(this));
-    tabs.onActivated.addListener(this.activatedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
       this._tabs = tabs.map((t: chrome.tabs.Tab) => new Tab(t));

@@ -1,7 +1,10 @@
 import { getScripting, getTabs, getDebugger } from "./env";
+import { Tabs } from "./tabs";
 import { sleep, withError } from "./utils";
 
 import clearAllInputs from "./scripts/clearAllInputs";
+
+declare let _tabs: Tabs;
 
 export class Tab {
   active: boolean = false;
@@ -47,7 +50,7 @@ export class Tab {
 
     this.createdAt = Date.now();
 
-    this.connect = this._withRemoved(withError(this._connect.bind(this)));
+    this.connect = this._withRemoved(this._connect.bind(this));
     this.clearAllInputs = this._withRemoved(
       withError(this._clearAllInputs.bind(this)),
     );
@@ -72,6 +75,7 @@ export class Tab {
 
   private async _discard(): Promise<Tab> {
     const rawTab = await getTabs().discard(this.id);
+    _tabs.discard(this.id, rawTab.id!);
     Object.assign(this, rawTab);
     return this;
   }
@@ -114,9 +118,8 @@ export class Tab {
     return await getTabs().detectLanguage(this.id);
   }
 
-  private async _connect(options: chrome.tabs.ConnectInfo) {
-    // TODO: Figure out how to handle returned port here...
-    getTabs().connect(this.id, options);
+  private _connect(options: chrome.tabs.ConnectInfo): chrome.runtime.Port {
+    return getTabs().connect(this.id, options);
   }
 
   private async _remove(): Promise<void> {
