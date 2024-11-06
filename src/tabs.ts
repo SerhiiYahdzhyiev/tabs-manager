@@ -88,7 +88,7 @@ export class Tabs {
 
     const urlChanged = "url" in changeInfo || "pendingUrl" in changeInfo;
 
-    if (!this.hasId(id) && !discarded) {
+    if (!this.hasId(id)) {
       console.warn(id);
       throw Error("Failed to find updated tab by id!");
     }
