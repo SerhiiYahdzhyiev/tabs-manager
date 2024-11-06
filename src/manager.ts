@@ -45,6 +45,7 @@ export class TabsManager implements IVersionable {
         const oldTab = _tabs.getTabById(tabId)!;
         _tabs.discard(tabId, tab.id!);
         Object.assign(oldTab, tab);
+        return oldTab;
       },
       query: browserTabs.query,
       remove: browserTabs.remove,
