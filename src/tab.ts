@@ -36,7 +36,7 @@ export class Tab {
     return (...args: unknown[]) => {
       if (this._removed) {
         console.warn("Cannot use operation on closed tab!");
-        return null;
+        return;
       }
       return cb(...args);
     };
