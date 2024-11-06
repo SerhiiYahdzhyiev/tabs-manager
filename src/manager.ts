@@ -47,7 +47,16 @@ export class TabsManager implements IVersionable {
         Object.assign(oldTab, tab);
         return oldTab;
       },
-      query: browserTabs.query,
+      query: async (info: chrome.tabs.QueryInfo) => {
+        const candidates = await browserTabs.query(info);
+        if (candidates?.length) {
+          for (let i = 0; i < candidates.length; i++) {
+            // TODO: Find a way to do it with less TS uglyness...
+            (candidates as unknown as Tab[])[i] = new Tab(candidates[i]);
+          }
+        }
+        return candidates;
+      },
       remove: browserTabs.remove,
       reload: browserTabs.reload,
       update: browserTabs.update,
