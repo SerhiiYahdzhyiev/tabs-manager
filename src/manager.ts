@@ -59,7 +59,13 @@ export class TabsManager implements IVersionable {
       },
       remove: browserTabs.remove,
       reload: browserTabs.reload,
-      update: browserTabs.update,
+      update: async (tabId: number, props: chrome.tabs.UpdateProperties) => {
+        const updated = await browserTabs.update(tabId, props);
+        // TODO: Consider getting the same functionality done without using
+        //       sleeps...
+        await sleep(200);
+        return _tabs.get(updated.id!) as Tab;
+      },
     });
 
     Object.assign(this, {
