@@ -1,6 +1,6 @@
 import { getScripting, getTabs, getDebugger } from "./env";
 import { Tabs } from "./tabs";
-import { sleep, withError } from "./utils";
+import { withError } from "./utils";
 
 import clearAllInputs from "./scripts/clearAllInputs";
 
@@ -13,6 +13,7 @@ export class Tab {
   windowId: number = -1;
   url: string = "";
   pendingUrl: string = "";
+
   createdAt: number;
   lastAccessed: number = Date.now();
 
@@ -86,8 +87,7 @@ export class Tab {
   }
 
   private async _screenshot(options: chrome.tabs.CaptureVisibleTabOptions) {
-    await this.update({ active: true });
-    await sleep(1000);
+    await this.focus();
     return await getTabs().captureVisibleTab(this.windowId, options);
   }
 
