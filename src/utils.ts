@@ -118,3 +118,7 @@ export function withError(cb: CallableFunction): CallableFunction {
     }
   };
 }
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

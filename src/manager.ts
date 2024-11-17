@@ -4,6 +4,8 @@ import { getTabs } from "./env";
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
 
+import { sleep } from "./utils";
+
 declare let _tabs: Tabs;
 
 export class TabsManager implements IVersionable {
@@ -31,13 +33,39 @@ export class TabsManager implements IVersionable {
     const browserTabs = getTabs();
 
     Object.assign(this, {
-      create: browserTabs.create,
+      create: async (...args: [chrome.tabs.CreateProperties]) => {
+        await browserTabs.create(...args);
+        await sleep(200);
+        return _tabs.tabs[_tabs.tabs.length - 1];
+      },
       connect: browserTabs.connect,
-      discard: browserTabs.discard,
-      query: browserTabs.query,
+      // TODO: Refactor?..
+      discard: async (tabId: number) => {
+        const tab = await browserTabs.discard(tabId);
+        const oldTab = _tabs.getTabById(tabId)!;
+        _tabs.discard(tabId, tab.id!);
+        Object.assign(oldTab, tab);
+        return oldTab;
+      },
+      query: async (info: chrome.tabs.QueryInfo) => {
+        const candidates = await browserTabs.query(info);
+        if (candidates?.length) {
+          for (let i = 0; i < candidates.length; i++) {
+            // TODO: Find a way to do it with less TS uglyness...
+            (candidates as unknown as Tab[])[i] = new Tab(candidates[i]);
+          }
+        }
+        return candidates;
+      },
       remove: browserTabs.remove,
       reload: browserTabs.reload,
-      update: browserTabs.update,
+      update: async (tabId: number, props: chrome.tabs.UpdateProperties) => {
+        const updated = await browserTabs.update(tabId, props);
+        // TODO: Consider getting the same functionality done without using
+        //       sleeps...
+        await sleep(200);
+        return _tabs.get(updated.id!) as Tab;
+      },
     });
 
     Object.assign(this, {
@@ -70,5 +98,28 @@ export class TabsManager implements IVersionable {
 
   public has(key: string | number): boolean {
     return _tabs.has(key);
+  }
+
+  public focus(tab: Tab): void {
+    tab.focus();
+  }
+
+  public get tabs(): Tab[] {
+    // INFO: Temporary realization, will be changed to respect filters...
+    return _tabs.tabs;
+  }
+
+  public get first(): Tab {
+    // WARN: This is temporary solution
+    // TODO: Replace with first element of fileterd tabs list of current
+    //       manager.
+    return _tabs.first;
+  }
+
+  public get last(): Tab {
+    // WARN: This is temporary solution
+    // TODO: Replace with first element of fileterd tabs list of current
+    //       manager.
+    return _tabs.last;
   }
 }

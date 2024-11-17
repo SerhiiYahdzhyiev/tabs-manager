@@ -81,6 +81,11 @@ export class Tabs {
     this.log("Updated!");
     this.log(id, changeInfo);
 
+    const discarded =
+      "discarded" in changeInfo && changeInfo.discarded === true;
+
+    if (discarded) return;
+
     const urlChanged = "url" in changeInfo || "pendingUrl" in changeInfo;
 
     if (!this.hasId(id)) {
@@ -188,15 +193,19 @@ export class Tabs {
   }
 
   private async activatedListener(info: chrome.tabs.TabActiveInfo) {
+    this.log("Activating...");
     if (this._activeId && this._activeId !== info.tabId) {
       const tab = this.get(this._activeId) as Tab;
-      if (tab) tab.active = false;
+      if (tab) {
+        this._tabs[tab.index].active = tab.active = false;
+      }
     }
+    this._activeId = info.tabId;
+    // TODO: Add ability to configure this behaviour
     const window = await chrome.windows.get(info.windowId);
     if (window.focused) {
-      this._activeId = info.tabId;
       const tab = this.get(info.tabId) as Tab;
-      tab.active = true;
+      if (tab) this._tabs[tab.index].active = tab.active = true;
     }
   }
 
@@ -207,6 +216,17 @@ export class Tabs {
         this._hostToIds.delete(k);
       }
     }
+  }
+
+  public discard(oldId: number, newId: number) {
+    // TODO: Refactor?..
+    const tab = this._idToTab.get(oldId)!;
+    this._idToTab.delete(oldId);
+    this._idToTab.set(newId, tab);
+    this.__maps__.updateMap("urlToIds", tab.url, oldId);
+    this.__maps__.updateMap("urlToIds", tab.url, newId);
+    this.__maps__.updateMap("hostToIds", tab.urlObj.host, oldId);
+    this.__maps__.updateMap("hostToIds", tab.urlObj.host, newId);
   }
 
   constructor() {
@@ -235,12 +255,12 @@ export class Tabs {
 
     const tabs = getTabs();
 
+    tabs.onActivated.addListener(this.activatedListener.bind(this));
     tabs.onUpdated.addListener(this.mainListener.bind(this));
     tabs.onRemoved.addListener(this.mainListener.bind(this));
     tabs.onCreated.addListener(this.createListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
     tabs.onRemoved.addListener(this.removeListener.bind(this));
-    tabs.onActivated.addListener(this.activatedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
       this._tabs = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
@@ -264,6 +284,14 @@ export class Tabs {
 
   get tabs(): Tab[] {
     return this._tabs;
+  }
+
+  get last(): Tab {
+    return this._tabs[this._tabs.length - 1];
+  }
+
+  get first(): Tab {
+    return this._tabs[0];
   }
 
   get activeId(): number {
