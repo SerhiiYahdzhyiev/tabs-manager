@@ -164,6 +164,12 @@ export class Tab {
     await this.remove();
   }
 
+  get host() {
+    return this.urlObj.host;
+  }
+
+  get hostname() {
+    return this.urlObj.hostname;
   }
 
   get uptime(): number {
