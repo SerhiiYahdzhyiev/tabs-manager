@@ -202,11 +202,11 @@ export class Tabs {
     }
     this._activeId = info.tabId;
     // TODO: Add ability to configure this behaviour
-    // const window = await chrome.windows.get(info.windowId);
-    // if (window.focused) {
-    const tab = this.get(info.tabId) as Tab;
-    if (tab) this._tabs[tab.index].active = tab.active = true;
-    // }
+    const window = await chrome.windows.get(info.windowId);
+    if (window.focused) {
+      const tab = this.get(info.tabId) as Tab;
+      if (tab) this._tabs[tab.index].active = tab.active = true;
+    }
   }
 
   private mainListener() {
