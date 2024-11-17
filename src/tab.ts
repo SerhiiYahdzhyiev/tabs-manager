@@ -14,6 +14,8 @@ export class Tab {
   url: string = "";
   pendingUrl: string = "";
 
+  urlObj: URL;
+
   createdAt: number;
   lastAccessed: number = Date.now();
 
@@ -44,6 +46,8 @@ export class Tab {
   }
 
   constructor(tab: chrome.tabs.Tab) {
+    this.urlObj = new URL((tab.url || tab.pendingUrl) ?? "");
+
     Object.assign(this, tab);
     Object.assign(this, {
       [Symbol.toStringTag]: `Tab.${this.urlObj.host || "broken"}`,
@@ -160,8 +164,6 @@ export class Tab {
     await this.remove();
   }
 
-  get urlObj(): URL {
-    return new URL(this.url || this.pendingUrl || "");
   }
 
   get uptime(): number {
