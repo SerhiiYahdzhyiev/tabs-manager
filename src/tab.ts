@@ -180,6 +180,10 @@ export class Tab {
     return this.urlObj.href;
   }
 
+  get protocol(): string {
+    return this.urlObj.protocol;
+  }
+
   get uptime(): number {
     return Date.now() - this.createdAt;
   }
