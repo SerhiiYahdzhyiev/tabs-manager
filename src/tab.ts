@@ -176,6 +176,10 @@ export class Tab {
     return this.urlObj.origin;
   }
 
+  get href(): string {
+    return this.urlObj.href;
+  }
+
   get uptime(): number {
     return Date.now() - this.createdAt;
   }
