@@ -172,6 +172,10 @@ export class Tab {
     return this.urlObj.hostname;
   }
 
+  get origin(): string {
+    return this.urlObj.origin;
+  }
+
   get uptime(): number {
     return Date.now() - this.createdAt;
   }
