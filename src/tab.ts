@@ -184,6 +184,10 @@ export class Tab {
     return this.urlObj.protocol;
   }
 
+  get username(): string {
+    return this.urlObj.username;
+  }
+
   get uptime(): number {
     return Date.now() - this.createdAt;
   }
