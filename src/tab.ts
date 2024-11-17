@@ -164,11 +164,11 @@ export class Tab {
     await this.remove();
   }
 
-  get host() {
+  get host(): string {
     return this.urlObj.host;
   }
 
-  get hostname() {
+  get hostname(): string {
     return this.urlObj.hostname;
   }
 
