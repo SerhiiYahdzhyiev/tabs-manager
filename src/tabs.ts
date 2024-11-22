@@ -68,9 +68,11 @@ export class Tabs {
     const url: string = (wrappedTab.url || wrappedTab.pendingUrl)!;
     this.__maps__.updateMap("urlToIds", url, wrappedTab.id);
 
-    const host = wrappedTab.urlObj.host;
+    const host = wrappedTab.urlObj?.host;
     if (host) {
       this.__maps__.updateMap("hostToIds", host, wrappedTab.id!);
+    } else {
+      console.warn("Failed to get host on wrapped tab!");
     }
   };
 
@@ -100,11 +102,11 @@ export class Tabs {
       // INFO: Remove id from old url entry...
       this.__maps__.updateMap("urlToIds", url, tab.id);
 
-      const oldHost = tab.urlObj.host;
+      const oldHost = tab.urlObj?.host;
       const newHost = new URL(changeInfo.url ?? "").host;
 
       if (newHost && newHost !== oldHost) {
-        this.__maps__.updateMap("hostToIds", oldHost, tab.id!);
+        if (oldHost) this.__maps__.updateMap("hostToIds", oldHost, tab.id!);
         this.__maps__.updateMap("hostToIds", newHost, tab.id!);
       }
     }
@@ -121,9 +123,11 @@ export class Tabs {
     this.log("Removed!");
     const oldTab = this.getTabById(id)!;
 
-    const host = oldTab?.urlObj.host;
-    if (this._hostToIds.has(host)) {
+    const host = oldTab?.urlObj?.host;
+    if (host && this._hostToIds.has(host)) {
       this.__maps__.updateMap("hostToIds", host, id);
+    } else {
+      console.warn("Failed to get host removed tab!");
     }
 
     this._tabs = this._tabs.filter((t) => t.id !== id);
@@ -225,8 +229,10 @@ export class Tabs {
     this._idToTab.set(newId, tab);
     this.__maps__.updateMap("urlToIds", tab.url, oldId);
     this.__maps__.updateMap("urlToIds", tab.url, newId);
-    this.__maps__.updateMap("hostToIds", tab.urlObj.host, oldId);
-    this.__maps__.updateMap("hostToIds", tab.urlObj.host, newId);
+    if (tab.urlObj?.host)
+      this.__maps__.updateMap("hostToIds", tab.urlObj?.host, oldId);
+    if (tab.urlObj?.host)
+      this.__maps__.updateMap("hostToIds", tab.urlObj?.host, newId);
   }
 
   constructor() {

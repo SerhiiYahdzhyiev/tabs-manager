@@ -46,7 +46,7 @@ export class Tab {
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
     Object.assign(this, {
-      [Symbol.toStringTag]: `Tab.${this.urlObj.host || "broken"}`,
+      [Symbol.toStringTag]: `Tab.${this.urlObj?.host || "broken"}`,
     });
 
     this.createdAt = Date.now();
@@ -160,8 +160,66 @@ export class Tab {
     await this.remove();
   }
 
-  get urlObj(): URL {
-    return new URL(this.url || this.pendingUrl || "");
+  get urlObj(): URL | null {
+    const url = this.url || this.pendingUrl;
+    if (!url) return null;
+    return new URL(url);
+  }
+
+  get host(): string {
+    return this.urlObj?.host || "";
+  }
+
+  get hostname(): string {
+    return this.urlObj?.hostname || "";
+  }
+
+  get origin(): string {
+    return this.urlObj?.origin || "";
+  }
+
+  get href(): string {
+    return this.urlObj?.href || "";
+  }
+
+  get protocol(): string {
+    return this.urlObj?.protocol || "";
+  }
+
+  get username(): string {
+    return this.urlObj?.username || "";
+  }
+
+  get hash(): string {
+    return this.urlObj?.hash || "";
+  }
+
+  get password(): string {
+    return this.urlObj?.password || "";
+  }
+
+  get pathname(): string {
+    return this.urlObj?.pathname || "";
+  }
+
+  get search(): string {
+    return this.urlObj?.search || "";
+  }
+
+  get searchParams(): URLSearchParams | null {
+    return this.urlObj?.searchParams || null;
+  }
+
+  get port(): number {
+    const candidate = parseInt(this.urlObj?.port || "");
+    if (candidate) return candidate;
+    if (this.protocol.includes("https")) return 443;
+    if (this.protocol.includes("http")) return 80;
+    if (this.protocol.includes("ftp")) return 21;
+    if (this.protocol.includes("sftp") || this.protocol.includes("ssh"))
+      return 22;
+    // TODO: Add more default port numbers for other possible protocols
+    return 0;
   }
 
   get uptime(): number {
