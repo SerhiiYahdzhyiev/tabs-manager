@@ -14,8 +14,6 @@ export class Tab {
   url: string = "";
   pendingUrl: string = "";
 
-  urlObj: URL;
-
   createdAt: number;
   lastAccessed: number = Date.now();
 
@@ -46,11 +44,9 @@ export class Tab {
   }
 
   constructor(tab: chrome.tabs.Tab) {
-    this.urlObj = new URL((tab.url || tab.pendingUrl) ?? "");
-
     Object.assign(this, tab);
     Object.assign(this, {
-      [Symbol.toStringTag]: `Tab.${this.urlObj.host || "broken"}`,
+      [Symbol.toStringTag]: `Tab.${this.urlObj?.host || "broken"}`,
     });
 
     this.createdAt = Date.now();
@@ -164,28 +160,34 @@ export class Tab {
     await this.remove();
   }
 
+  get urlObj(): URL | null {
+    const url = this.url || this.pendingUrl;
+    if (!url) return null;
+    return new URL(url);
+  }
+
   get host(): string {
-    return this.urlObj.host;
+    return this.urlObj?.host || "";
   }
 
   get hostname(): string {
-    return this.urlObj.hostname;
+    return this.urlObj?.hostname || "";
   }
 
   get origin(): string {
-    return this.urlObj.origin;
+    return this.urlObj?.origin || "";
   }
 
   get href(): string {
-    return this.urlObj.href;
+    return this.urlObj?.href || "";
   }
 
   get protocol(): string {
-    return this.urlObj.protocol;
+    return this.urlObj?.protocol || "";
   }
 
   get username(): string {
-    return this.urlObj.username;
+    return this.urlObj?.username || "";
   }
 
   get uptime(): number {
