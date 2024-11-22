@@ -211,7 +211,15 @@ export class Tab {
   }
 
   get port(): number {
-    return parseInt(this.urlObj?.port || "") || -1;
+    const candidate = parseInt(this.urlObj?.port || "");
+    if (candidate) return candidate;
+    if (this.protocol.includes("https")) return 443;
+    if (this.protocol.includes("http")) return 80;
+    if (this.protocol.includes("ftp")) return 21;
+    if (this.protocol.includes("sftp") || this.protocol.includes("ssh"))
+      return 22;
+    // TODO: Add more default port numbers for other possible protocols
+    return 0;
   }
 
   get uptime(): number {
