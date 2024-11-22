@@ -190,6 +190,30 @@ export class Tab {
     return this.urlObj?.username || "";
   }
 
+  get hash(): string {
+    return this.urlObj?.hash || "";
+  }
+
+  get password(): string {
+    return this.urlObj?.password || "";
+  }
+
+  get pathname(): string {
+    return this.urlObj?.pathname || "";
+  }
+
+  get search(): string {
+    return this.urlObj?.search || "";
+  }
+
+  get searchParams(): URLSearchParams | null {
+    return this.urlObj?.searchParams || null;
+  }
+
+  get port(): number {
+    return parseInt(this.urlObj?.port || "") || -1;
+  }
+
   get uptime(): number {
     return Date.now() - this.createdAt;
   }
