@@ -1,6 +1,7 @@
 "use strict";
 
-import { Environment, getRuntime } from "./env";
+import { Environment } from "./env";
+import { getRuntime } from "./api";
 
 import { Tabs } from "./tabs";
 import { TabsManager } from "./manager";
