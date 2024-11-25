@@ -309,7 +309,7 @@ export class Tabs {
   }
 
   get first(): Tab {
-    return this._tabs[0];
+    return this._idxToTab.get(0)!;
   }
 
   get activeId(): number {
