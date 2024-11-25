@@ -1,4 +1,6 @@
 Environment
 ===========
 
-.. autofunction:: getEnvType
+.. autofunction:: Environment.getEnvType
+
+.. autofunction:: Environment.assertEnv

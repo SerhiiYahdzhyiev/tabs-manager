@@ -23,7 +23,14 @@ export class Environment {
     console.warn("Environment detection failed!");
     return EnvironmentType.INVALID;
   }
-
+  /**
+ * Check if the current environment matches the specified type.
+ *
+ * @param {EnvironmentType} type - The expected environment type ("worker" or
+ * "window").
+ * @returns {boolean} `true` if the environment matches the specified type,
+ * otherwise `false`.
+ */
   public static assertEnv(type: EnvironmentType): boolean {
     switch (type) {
       case EnvironmentType.WINDOW:
