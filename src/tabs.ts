@@ -297,7 +297,11 @@ export class Tabs {
   }
 
   get tabs(): Tab[] {
-    return this._tabs;
+    const _tabs = [];
+    for (const [i, t] of this._idxToTab.entries()) {
+      _tabs[i] = t;
+    }
+    return _tabs;
   }
 
   get last(): Tab {
