@@ -56,10 +56,11 @@ export class Tabs {
     if (this.__debug__) console.log(...args);
   }
 
-  private createListener = (tab: chrome.tabs.Tab) => {
+  private createListener = async (tab: chrome.tabs.Tab) => {
     this.log("Created!");
     const wrappedTab = new Tab(tab);
     this._tabs = [...this._tabs, wrappedTab];
+    this._idxToTab.set(this._tabs.length - 1, wrappedTab);
     if (!this._assertTabId(wrappedTab)) {
       console.warn("Skipping tab without id!");
       console.warn("This tab will not be saved in id->tab map!");
@@ -83,6 +84,7 @@ export class Tabs {
     } else {
       console.warn("Failed to get host on wrapped tab!");
     }
+    await this._updateIndecies();
   };
 
   private updateListener = (
