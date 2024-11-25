@@ -25,6 +25,7 @@ export class Tabs {
 
   private _urlToIds = new Map<string, number[]>();
   private _idToTab = new Map<number, Tab>();
+  private _idxToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
 
   private _hostToIds = new Map<string, number[]>();
@@ -237,6 +238,7 @@ export class Tabs {
 
   constructor() {
     this.__maps__.registerMap<number, Tab>("idToTab", this._idToTab);
+    this.__maps__.registerMap<number, Tab>("idxToTab", this._idxToTab);
     this.__maps__.registerMap<string, number[]>("urlToIds", this._urlToIds);
     this.__maps__.registerMap<string, Iterable<number>>(
       "hostToIds",
@@ -245,6 +247,11 @@ export class Tabs {
 
     this.__maps__.registerUpdater<Map<number, Tab>, number, Tab>(
       "idToTab",
+      simpleOneToOneMapUpdater,
+    );
+
+    this.__maps__.registerUpdater<Map<number, Tab>, number, Tab>(
+      "idxToTab",
       simpleOneToOneMapUpdater,
     );
 
@@ -281,6 +288,7 @@ export class Tabs {
           this.__maps__.updateMap("hostToIds", host, tab.id!);
         }
         this.__maps__.updateMap("urlToIds", url, tab.id!);
+        this.__maps__.updateMap("idxToTab", tab.index, tab);
       });
     });
     Object.assign(this, {
