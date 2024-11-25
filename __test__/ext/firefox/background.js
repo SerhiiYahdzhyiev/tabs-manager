@@ -1,0 +1,1 @@
+globalThis.manager = new TabsManager();
