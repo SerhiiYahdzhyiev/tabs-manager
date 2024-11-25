@@ -28,6 +28,14 @@ export class Tabs {
   private _idxToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
 
+  private async _updateIndecies() {
+    this.log("Updating indecies...");
+    for (let i = 0; i < this._tabs.length; i++) {
+      this._tabs[i].index = (await getTabs().get(this._tabs[i].id)).index;
+      this.__maps__.updateMap("idxToTab", this._tabs[i].index, this._tabs[i]);
+    }
+  }
+
   private _hostToIds = new Map<string, number[]>();
 
   private _assertTabId(tab: Tab): boolean {
@@ -120,7 +128,11 @@ export class Tabs {
     }
   };
 
-  private removeListener = (id: number) => {
+  private movedListener = async () => {
+    await this._updateIndecies();
+  };
+
+  private removeListener = async (id: number) => {
     this.log("Removed!");
     const oldTab = this.getTabById(id)!;
 
@@ -274,6 +286,7 @@ export class Tabs {
     tabs.onCreated.addListener(this.createListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
     tabs.onRemoved.addListener(this.removeListener.bind(this));
+    tabs.onMoved.addListener(this.movedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
       this._tabs = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
