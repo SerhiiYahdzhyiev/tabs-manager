@@ -151,6 +151,7 @@ export class Tabs {
     if (this._urlToIds.has(url)) {
       this.__maps__.updateMap("urlToIds", url, id);
     }
+    await this._updateIndecies();
   };
 
   public getTabById(id: number): Tab | null {
