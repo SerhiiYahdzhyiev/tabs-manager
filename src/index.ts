@@ -1,6 +1,6 @@
 "use strict";
 
-import { assertEnv, getEnvType, getRuntime } from "./env";
+import { Environment, getRuntime } from "./env";
 
 import { Tabs } from "./tabs";
 import { TabsManager } from "./manager";
@@ -8,7 +8,7 @@ import { TabsManager } from "./manager";
 const requiredPermissions = ["tabs", "activeTab"];
 
 (() => {
-  if (!assertEnv(getEnvType())) {
+  if (!Environment.assertEnv(Environment.getEnvType())) {
     console.warn("This environment is not suitable for TabsManager!");
     return 1;
   }
@@ -27,7 +27,7 @@ const requiredPermissions = ["tabs", "activeTab"];
   }
 
   // INFO: Globals assignment...
-  Object.assign(globalThis, { envType: getEnvType() });
+  Object.assign(globalThis, { envType: Environment.getEnvType() });
   Object.assign(globalThis, { _tabs: new Tabs() });
 
   Object.assign(globalThis, { TabsManager: TabsManager });
