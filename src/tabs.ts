@@ -305,7 +305,7 @@ export class Tabs {
   }
 
   get last(): Tab {
-    return this._tabs[this._tabs.length - 1];
+    return this._idxToTab.get(this._tabs.length - 1)!;
   }
 
   get first(): Tab {
