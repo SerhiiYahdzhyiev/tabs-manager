@@ -1,4 +1,4 @@
-import { getTabs } from "./env";
+import { getTabs } from "./api";
 
 import { Tab } from "./tab";
 import { TabMaps } from "./tab-maps";

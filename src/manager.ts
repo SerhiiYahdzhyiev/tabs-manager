@@ -1,5 +1,5 @@
 import { IVersionable } from "./interfaces";
-import { getTabs } from "./env";
+import { getTabs } from "./api";
 
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";

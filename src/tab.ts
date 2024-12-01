@@ -1,4 +1,4 @@
-import { getScripting, getTabs, getDebugger } from "./env";
+import { getScripting, getTabs, getDebugger } from "./api";
 import { Tabs } from "./tabs";
 import { withError } from "./utils";
 
