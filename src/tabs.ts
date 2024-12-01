@@ -30,9 +30,18 @@ export class Tabs {
 
   private async _updateIndecies() {
     this.log("Updating indecies...");
-    for (let i = 0; i < this._tabs.length; i++) {
-      this._tabs[i].index = (await getTabs().get(this._tabs[i].id)).index;
-      this.__maps__.updateMap("idxToTab", this._tabs[i].index, this._tabs[i]);
+    // INFO: Probably rebuilding the entire map is not the efficient way,
+    //       but I've struggled to write it differently without introducing
+    //       internal structures' consistency bugs...
+    // TODO: Try to write more efficient updating algorithm...
+    this._idxToTab.clear();
+    for (const tab of this._tabs) {
+      const internalIdx = tab.index;
+      this.log("Internal index: " + internalIdx);
+      const realIdx = (await getTabs().get(tab.id)).index;
+      this.log("Real index: " + realIdx);
+      tab.index = realIdx;
+      this.__maps__.updateMap("idxToTab", realIdx, tab);
     }
   }
 
@@ -146,7 +155,6 @@ export class Tabs {
     }
 
     this._tabs = this._tabs.filter((t) => t.id !== id);
-    this._idToTab.delete(id);
     const url = (oldTab.url || oldTab.pendingUrl)!;
     if (this._urlToIds.has(url)) {
       this.__maps__.updateMap("urlToIds", url, id);
