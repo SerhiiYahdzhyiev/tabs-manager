@@ -25,7 +25,25 @@ export class Tabs {
 
   private _urlToIds = new Map<string, number[]>();
   private _idToTab = new Map<number, Tab>();
+  private _idxToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
+
+  private async _updateIndecies() {
+    this.log("Updating indecies...");
+    // INFO: Probably rebuilding the entire map is not the efficient way,
+    //       but I've struggled to write it differently without introducing
+    //       internal structures' consistency bugs...
+    // TODO: Try to write more efficient updating algorithm...
+    this._idxToTab.clear();
+    for (const tab of this._tabs) {
+      const internalIdx = tab.index;
+      this.log("Internal index: " + internalIdx);
+      const realIdx = (await getTabs().get(tab.id)).index;
+      this.log("Real index: " + realIdx);
+      tab.index = realIdx;
+      this.__maps__.updateMap("idxToTab", realIdx, tab);
+    }
+  }
 
   private _hostToIds = new Map<string, number[]>();
 
@@ -47,10 +65,11 @@ export class Tabs {
     if (this.__debug__) console.log(...args);
   }
 
-  private createListener = (tab: chrome.tabs.Tab) => {
+  private createListener = async (tab: chrome.tabs.Tab) => {
     this.log("Created!");
     const wrappedTab = new Tab(tab);
     this._tabs = [...this._tabs, wrappedTab];
+    this._idxToTab.set(this._tabs.length - 1, wrappedTab);
     if (!this._assertTabId(wrappedTab)) {
       console.warn("Skipping tab without id!");
       console.warn("This tab will not be saved in id->tab map!");
@@ -74,6 +93,7 @@ export class Tabs {
     } else {
       console.warn("Failed to get host on wrapped tab!");
     }
+    await this._updateIndecies();
   };
 
   private updateListener = (
@@ -119,7 +139,11 @@ export class Tabs {
     }
   };
 
-  private removeListener = (id: number) => {
+  private movedListener = async () => {
+    await this._updateIndecies();
+  };
+
+  private removeListener = async (id: number) => {
     this.log("Removed!");
     const oldTab = this.getTabById(id)!;
 
@@ -131,11 +155,11 @@ export class Tabs {
     }
 
     this._tabs = this._tabs.filter((t) => t.id !== id);
-    this._idToTab.delete(id);
     const url = (oldTab.url || oldTab.pendingUrl)!;
     if (this._urlToIds.has(url)) {
       this.__maps__.updateMap("urlToIds", url, id);
     }
+    await this._updateIndecies();
   };
 
   public getTabById(id: number): Tab | null {
@@ -237,6 +261,7 @@ export class Tabs {
 
   constructor() {
     this.__maps__.registerMap<number, Tab>("idToTab", this._idToTab);
+    this.__maps__.registerMap<number, Tab>("idxToTab", this._idxToTab);
     this.__maps__.registerMap<string, number[]>("urlToIds", this._urlToIds);
     this.__maps__.registerMap<string, Iterable<number>>(
       "hostToIds",
@@ -245,6 +270,11 @@ export class Tabs {
 
     this.__maps__.registerUpdater<Map<number, Tab>, number, Tab>(
       "idToTab",
+      simpleOneToOneMapUpdater,
+    );
+
+    this.__maps__.registerUpdater<Map<number, Tab>, number, Tab>(
+      "idxToTab",
       simpleOneToOneMapUpdater,
     );
 
@@ -267,6 +297,7 @@ export class Tabs {
     tabs.onCreated.addListener(this.createListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
     tabs.onRemoved.addListener(this.removeListener.bind(this));
+    tabs.onMoved.addListener(this.movedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
       this._tabs = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
@@ -281,6 +312,7 @@ export class Tabs {
           this.__maps__.updateMap("hostToIds", host, tab.id!);
         }
         this.__maps__.updateMap("urlToIds", url, tab.id!);
+        this.__maps__.updateMap("idxToTab", tab.index, tab);
       });
     });
     Object.assign(this, {
@@ -289,15 +321,19 @@ export class Tabs {
   }
 
   get tabs(): Tab[] {
-    return this._tabs;
+    const _tabs = [];
+    for (const [i, t] of this._idxToTab.entries()) {
+      _tabs[i] = t;
+    }
+    return _tabs;
   }
 
   get last(): Tab {
-    return this._tabs[this._tabs.length - 1];
+    return this._idxToTab.get(this._tabs.length - 1)!;
   }
 
   get first(): Tab {
-    return this._tabs[0];
+    return this._idxToTab.get(0)!;
   }
 
   get activeId(): number {
