@@ -61,11 +61,10 @@ export class TabsManager implements IVersionable {
     Object.assign(this, {
       /**
        * Creates a new browser tab.
-       * @param {chrome.tabs.CreateProperties[]} args - Tab creation properties.
+       * @param {chrome.tabs.CreateProperties} props - Tab creation properties.
+       * Can be omitted. Defaults to {}.
        * @returns {Promise<Tab>} The created tab.
        */
-      create: async (...args: [chrome.tabs.CreateProperties]) => {
-        await browserTabs.create(...args);
       create: async (props: chrome.tabs.CreateProperties = {}) => {
         await browserTabs.create(props);
         await sleep(200);
