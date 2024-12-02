@@ -29,10 +29,10 @@ export class Environment {
   }
 
   /**
-   * Verifies if the current environment matches the specified type.
+   * Verifies if the current environment is suitable for TabsManager library.
    *
    * @param {EnvironmentType} type - The expected environment type ("worker" or "window").
-   * @returns {boolean} `true` if the current environment matches the specified type; otherwise, `false`.
+   * @returns {boolean} `true` if the current environment is suitable; otherwise, `false`.
    */
   public static assertEnv(type: EnvironmentType): boolean {
     switch (type) {
