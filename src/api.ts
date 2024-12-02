@@ -12,7 +12,7 @@ export class Browser {
   /**
    * Retrieves the `chrome.tabs` API or the equivalent `browser.tabs` API.
    *
-   * @returns {typeof chrome.tabs | undefined} The tabs API object, or `undefined` if unavailable.
+   * @returns {chrome.tabs | undefined} The tabs API object, or `undefined` if unavailable.
    */
   public static getTabs() {
     if (typeof chrome !== "undefined") {
@@ -24,7 +24,7 @@ export class Browser {
   /**
    * Retrieves the `chrome.runtime` API or the equivalent `browser.runtime` API.
    *
-   * @returns {typeof chrome.runtime | undefined} The runtime API object, or `undefined` if unavailable.
+   * @returns {chrome.runtime | undefined} The runtime API object, or `undefined` if unavailable.
    */
   public static getRuntime() {
     if (typeof chrome !== "undefined") {
@@ -37,7 +37,7 @@ export class Browser {
    * Retrieves the `chrome.scripting` API or the equivalent `browser.scripting` API.
    * Warns if the required "scripting" permission is not granted.
    *
-   * @returns {typeof chrome.scripting | null} The scripting API object, or `null` if unavailable or lacking permission.
+   * @returns {chrome.scripting | null} The scripting API object, or `null` if unavailable or lacking permission.
    */
   public static getScripting() {
     if (!this.getRuntime().getManifest().permissions?.includes("scripting")) {
@@ -54,7 +54,7 @@ export class Browser {
    * Retrieves the `chrome.debugger` API or the equivalent `browser.debugger` API.
    * Warns if the required "debugger" permission is not granted.
    *
-   * @returns {typeof chrome.debugger | null} The debugger API object, or `null` if unavailable or lacking permission.
+   * @returns {chrome.debugger | null} The debugger API object, or `null` if unavailable or lacking permission.
    */
   public static getDebugger(): typeof chrome.debugger | null {
     if (!this.getRuntime().getManifest().permissions?.includes("debugger")) {
