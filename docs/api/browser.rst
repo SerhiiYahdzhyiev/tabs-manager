@@ -1,5 +1,5 @@
-Environment
-===========
+Browser
+=======
 
 .. autoclass:: Browser
 
