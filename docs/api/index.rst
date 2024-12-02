@@ -6,4 +6,5 @@ API Documentation
    :glob:
 
    Environment <env>
+   TabMaps <tab-maps>
    Utils <utils>
