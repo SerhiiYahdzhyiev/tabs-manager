@@ -1,4 +1,4 @@
-import { getScripting, getTabs, getDebugger } from "./api";
+import { Browser } from "./api";
 import { Tabs } from "./tabs";
 import { withError } from "./utils";
 
@@ -75,7 +75,7 @@ export class Tab {
   }
 
   private async _discard(): Promise<Tab> {
-    const rawTab = await getTabs().discard(this.id);
+    const rawTab = await Browser.getTabs().discard(this.id);
     _tabs.discard(this.id, rawTab.id!);
     Object.assign(this, rawTab);
     return this;
@@ -88,53 +88,53 @@ export class Tab {
 
   private async _screenshot(options: chrome.tabs.CaptureVisibleTabOptions) {
     await this.focus();
-    return await getTabs().captureVisibleTab(this.windowId, options);
+    return await Browser.getTabs().captureVisibleTab(this.windowId, options);
   }
 
   private async _move(options: chrome.tabs.MoveProperties): Promise<Tab> {
-    const moved = await getTabs().move(this.id, options);
+    const moved = await Browser.getTabs().move(this.id, options);
     Object.assign(this, moved);
     return this;
   }
 
   private async _reload(options: chrome.tabs.ReloadProperties): Promise<void> {
-    await getTabs().reload(this.id, options);
+    await Browser.getTabs().reload(this.id, options);
   }
 
   private async _goForward(): Promise<void> {
-    await getTabs().goForward(this.id);
+    await Browser.getTabs().goForward(this.id);
   }
 
   private async _goBack(): Promise<void> {
-    await getTabs().goBack(this.id);
+    await Browser.getTabs().goBack(this.id);
   }
 
   private async _duplicate(): Promise<void> {
     // TODO: Figure out how to handle returned tab here...
-    await getTabs().duplicate(this.id);
+    await Browser.getTabs().duplicate(this.id);
   }
 
   private async _language(): Promise<string> {
-    return await getTabs().detectLanguage(this.id);
+    return await Browser.getTabs().detectLanguage(this.id);
   }
 
   private _connect(options: chrome.tabs.ConnectInfo): chrome.runtime.Port {
-    return getTabs().connect(this.id, options);
+    return Browser.getTabs().connect(this.id, options);
   }
 
   private async _remove(): Promise<void> {
     this._removed = true;
-    await getTabs().remove(this.id);
+    await Browser.getTabs().remove(this.id);
   }
 
   private async _update(options: chrome.tabs.UpdateProperties): Promise<Tab> {
-    await getTabs().update(this.id, options);
+    await Browser.getTabs().update(this.id, options);
     Object.assign(this, options);
     return this;
   }
 
   private async _clearAllInputs(): Promise<void> {
-    const scripting = getScripting();
+    const scripting = Browser.getScripting();
     if (!scripting)
       throw new Error("Scripting is not permitted or/and available!");
 
@@ -145,7 +145,7 @@ export class Tab {
   }
 
   public async forceClose(): Promise<void> {
-    const deb = getDebugger();
+    const deb = Browser.getDebugger();
     if (!deb) throw new Error("Debugger is not permitted or/and available!");
 
     try {

@@ -5,39 +5,41 @@ declare let browser: {
   debugger: typeof chrome.debugger;
 };
 
-export function getTabs() {
-  if (typeof chrome !== "undefined") {
-    return chrome.tabs;
-  }
-  return browser?.tabs;
-}
-
-export function getRuntime() {
-  if (typeof chrome !== "undefined") {
-    return chrome.runtime;
-  }
-  return browser.runtime;
-}
-
-export function getScripting() {
-  if (!getRuntime().getManifest().permissions?.includes("scripting")) {
-    console.warn("This runtime doesn't have required optional permission!");
-    return null;
-  }
-  if (typeof chrome !== "undefined") {
-    return chrome.scripting;
-  }
-  return browser.scripting;
-}
-
-export function getDebugger(): typeof chrome.debugger | null {
-  if (!getRuntime().getManifest().permissions?.includes("debugger")) {
-    console.warn("This runtime doesn't have required optional permission!");
-    return null;
+export class Browser {
+  public static getTabs() {
+    if (typeof chrome !== "undefined") {
+      return chrome.tabs;
+    }
+    return browser?.tabs;
   }
 
-  if (typeof chrome !== "undefined") {
-    return chrome.debugger;
+  public static getRuntime() {
+    if (typeof chrome !== "undefined") {
+      return chrome.runtime;
+    }
+    return browser.runtime;
   }
-  return browser.debugger;
+
+  public static getScripting() {
+    if (!this.getRuntime().getManifest().permissions?.includes("scripting")) {
+      console.warn("This runtime doesn't have required optional permission!");
+      return null;
+    }
+    if (typeof chrome !== "undefined") {
+      return chrome.scripting;
+    }
+    return browser.scripting;
+  }
+
+  public static getDebugger(): typeof chrome.debugger | null {
+    if (!this.getRuntime().getManifest().permissions?.includes("debugger")) {
+      console.warn("This runtime doesn't have required optional permission!");
+      return null;
+    }
+
+    if (typeof chrome !== "undefined") {
+      return chrome.debugger;
+    }
+    return browser.debugger;
+  }
 }
