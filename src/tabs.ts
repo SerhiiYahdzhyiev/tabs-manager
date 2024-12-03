@@ -163,6 +163,12 @@ export class Tabs {
   }
 
   public getTabsByUrl(url: string): Tab[] {
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return [];
+    }
     const ids = this._urlToIds.get(url);
     if (ids && ids.length) {
       const result: Tab[] = [];
@@ -200,6 +206,12 @@ export class Tabs {
   }
 
   public hasUrl(url: string) {
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return false;
+    }
     return this._urlToIds.has(url);
   }
 
