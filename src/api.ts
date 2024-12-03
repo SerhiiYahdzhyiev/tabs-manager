@@ -3,6 +3,7 @@ declare let browser: {
   runtime: typeof chrome.runtime;
   scripting: typeof chrome.scripting;
   debugger: typeof chrome.debugger;
+  windows: typeof chrome.windows;
 };
 
 export function getTabs() {
@@ -40,4 +41,11 @@ export function getDebugger(): typeof chrome.debugger | null {
     return chrome.debugger;
   }
   return browser.debugger;
+}
+
+export function getWindows(): typeof chrome.windows | null {
+  if (typeof chrome !== "undefined") {
+    return chrome.windows;
+  }
+  return browser.windows;
 }
