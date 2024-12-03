@@ -101,6 +101,7 @@ export class TabsManager implements IVersionable {
   }
 
   public focus(tab: Tab): void {
+    // TODO: Accept plain tab and wrap it here?
     tab.focus();
   }
 
