@@ -83,7 +83,7 @@ export class Tab {
 
   public async focus(): Promise<void> {
     // TODO: Consider making this behaviour configurable...
-    await getWindows()?.update(this.windowId, {
+    await Browser.getWindows()?.update(this.windowId, {
       state: "normal",
       focused: true,
     });

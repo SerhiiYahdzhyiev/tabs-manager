@@ -68,11 +68,17 @@ export class Browser {
     }
     return browser.debugger;
   }
+
+  /**
+   * Retrieves the `chrome.windows` API or the equivalent `browser.windows` API.
+   *
+   * @returns {chrome.windows | null} The windows API object, or `null` if unavailable.
+   */
+  public static getWindows(): typeof chrome.windows | null {
+    if (typeof chrome !== "undefined") {
+      return chrome.windows;
+    }
+    return browser.windows;
+  }
 }
 
-export function getWindows(): typeof chrome.windows | null {
-  if (typeof chrome !== "undefined") {
-    return chrome.windows;
-  }
-  return browser.windows;
-}
