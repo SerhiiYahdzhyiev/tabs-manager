@@ -1,4 +1,4 @@
-import { getTabs } from "./api";
+import { Browser } from "./api";
 
 import { Tab } from "./tab";
 import { TabMaps } from "./tab-maps";
@@ -34,7 +34,7 @@ export class Tabs {
     for (const tab of this._tabs) {
       const internalIdx = tab.index;
       this.log("Internal index: " + internalIdx);
-      const realIdx = (await getTabs().get(tab.id)).index;
+      const realIdx = (await Browser.getTabs().get(tab.id)).index;
       this.log("Real index: " + realIdx);
       tab.index = realIdx;
       this.__maps__.updateMap("idxToTab", realIdx, tab);
@@ -299,7 +299,7 @@ export class Tabs {
       number
     >("hostToIds", stringToIdsMapUpdater);
 
-    const tabs = getTabs();
+    const tabs = Browser.getTabs();
 
     tabs.onActivated.addListener(this.activatedListener.bind(this));
     tabs.onUpdated.addListener(this.mainListener.bind(this));

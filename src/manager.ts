@@ -1,5 +1,5 @@
 import { IVersionable } from "./interfaces";
-import { getTabs } from "./api";
+import { Browser } from "./api";
 
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
@@ -30,7 +30,7 @@ export class TabsManager implements IVersionable {
       Object.setPrototypeOf(this, TabsManager.prototype);
     }
 
-    const browserTabs = getTabs();
+    const browserTabs = Browser.getTabs();
 
     Object.assign(this, {
       create: async (props: chrome.tabs.CreateProperties = {}) => {

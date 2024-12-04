@@ -1,0 +1,6 @@
+Browser
+=======
+
+.. autoclass:: Browser
+   :members:
+
