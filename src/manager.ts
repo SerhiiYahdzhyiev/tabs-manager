@@ -33,8 +33,8 @@ export class TabsManager implements IVersionable {
     const browserTabs = Browser.getTabs();
 
     Object.assign(this, {
-      create: async (...args: [chrome.tabs.CreateProperties]) => {
-        await browserTabs.create(...args);
+      create: async (props: chrome.tabs.CreateProperties = {}) => {
+        await browserTabs.create(props);
         await sleep(200);
         return _tabs.tabs[_tabs.tabs.length - 1];
       },
@@ -101,6 +101,7 @@ export class TabsManager implements IVersionable {
   }
 
   public focus(tab: Tab): void {
+    // TODO: Accept plain tab and wrap it here?
     tab.focus();
   }
 

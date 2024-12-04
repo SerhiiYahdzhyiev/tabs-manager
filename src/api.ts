@@ -3,6 +3,7 @@ declare let browser: {
   runtime: typeof chrome.runtime;
   scripting: typeof chrome.scripting;
   debugger: typeof chrome.debugger;
+  windows: typeof chrome.windows;
 };
 
 /**
@@ -67,4 +68,11 @@ export class Browser {
     }
     return browser.debugger;
   }
+}
+
+export function getWindows(): typeof chrome.windows | null {
+  if (typeof chrome !== "undefined") {
+    return chrome.windows;
+  }
+  return browser.windows;
 }
