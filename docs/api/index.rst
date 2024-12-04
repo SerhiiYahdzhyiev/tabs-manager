@@ -5,6 +5,7 @@ API Documentation
    :maxdepth: 1
    :glob:
 
+   Browser <browser>
    Environment <env>
    Tab <tab>
    TabsManager <manager>

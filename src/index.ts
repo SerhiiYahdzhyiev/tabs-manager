@@ -1,7 +1,7 @@
 "use strict";
 
 import { Environment } from "./env";
-import { getRuntime } from "./api";
+import { Browser } from "./api";
 
 import { Tabs } from "./tabs";
 import { TabsManager } from "./manager";
@@ -14,7 +14,7 @@ const requiredPermissions = ["tabs", "activeTab"];
     return 1;
   }
 
-  const manifestPermissions = getRuntime().getManifest()["permissions"];
+  const manifestPermissions = Browser.getRuntime().getManifest()["permissions"];
 
   const requiredPermissionsGranted = requiredPermissions.every((permission) =>
     (manifestPermissions as string[])?.includes(permission),

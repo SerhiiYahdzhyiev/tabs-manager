@@ -4,40 +4,53 @@ declare let browser: {
   tabs: typeof chrome.tabs;
 };
 
+/**
+ * Utility class for determining and validating the current environment type.
+ */
 export class Environment {
   /**
-   * Return the type of environment.
+   * Detects the type of the current execution environment.
    *
-   * @returns {EnvironmentType} "worker" | "window" | "invalid"
+   * @returns {EnvironmentType} One of "worker", "window", or "invalid".
    */
   public static getEnvType(): EnvironmentType {
-    const gThis = String(globalThis);
-    if (gThis.match(/worker/gi)) {
+    const globalThisString = String(globalThis);
+
+    if (/worker/i.test(globalThisString)) {
       return EnvironmentType.WORKER;
-    } else if (gThis.match(/window/gi)) {
+    }
+
+    if (/window/i.test(globalThisString)) {
       return EnvironmentType.WINDOW;
     }
-    console.warn("Environment detection failed!");
+
+    console.warn("Environment detection failed! Defaulting to 'invalid'.");
     return EnvironmentType.INVALID;
   }
+
   /**
- * Check if the current environment matches the specified type.
- *
- * @param {EnvironmentType} type - The expected environment type ("worker" or
- * "window").
- * @returns {boolean} `true` if the environment matches the specified type,
- * otherwise `false`.
- */
+   * Verifies if the current environment is suitable for TabsManager library.
+   *
+   * @param {EnvironmentType} type - The expected environment type ("worker" or "window").
+   * @returns {boolean} `true` if the current environment is suitable; otherwise, `false`.
+   */
   public static assertEnv(type: EnvironmentType): boolean {
     switch (type) {
       case EnvironmentType.WINDOW:
-        return !!(
-          (typeof browser !== "undefined" && browser.tabs) ||
-          (globalThis.chrome && chrome.tabs)
+        // Check for a browser tabs API presence in a window context.
+        return (
+          (typeof browser !== "undefined" && browser.tabs !== undefined) ||
+          (typeof chrome !== "undefined" && chrome.tabs !== undefined)
         );
       case EnvironmentType.WORKER:
-        return !!((chrome && chrome.tabs) || (browser && browser.tabs));
+        // Validate worker-specific environment presence.
+        return (
+          (typeof browser !== "undefined" && browser.tabs !== undefined) ||
+          (typeof chrome !== "undefined" && chrome.tabs !== undefined)
+        );
+      default:
+        console.warn(`Unknown environment type: ${type}`);
+        return false;
     }
-    return false;
   }
 }

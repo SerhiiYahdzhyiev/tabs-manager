@@ -1,15 +1,11 @@
-import { getTabs } from "./api";
+import { Browser } from "./api";
 
 import { Tab } from "./tab";
 import { TabMaps } from "./tab-maps";
 
 import { ITabMaps, TabsMapOneToMany } from "./types";
 
-import {
-  ensureClosingSlash,
-  simpleOneToOneMapUpdater,
-  stringToIdsMapUpdater,
-} from "./utils";
+import { simpleOneToOneMapUpdater, stringToIdsMapUpdater } from "./utils";
 
 export class Tabs {
   private __debug__ = false;
@@ -38,7 +34,7 @@ export class Tabs {
     for (const tab of this._tabs) {
       const internalIdx = tab.index;
       this.log("Internal index: " + internalIdx);
-      const realIdx = (await getTabs().get(tab.id)).index;
+      const realIdx = (await Browser.getTabs().get(tab.id)).index;
       this.log("Real index: " + realIdx);
       tab.index = realIdx;
       this.__maps__.updateMap("idxToTab", realIdx, tab);
@@ -167,7 +163,13 @@ export class Tabs {
   }
 
   public getTabsByUrl(url: string): Tab[] {
-    const ids = this._urlToIds.get(ensureClosingSlash(url));
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return [];
+    }
+    const ids = this._urlToIds.get(url);
     if (ids && ids.length) {
       const result: Tab[] = [];
       for (const id of ids) {
@@ -191,7 +193,9 @@ export class Tabs {
       if (!isNaN(+key) && +key > 0) {
         candidate = this.getTabById(+key);
       }
-      if (!candidate) candidate = this.getTabsByUrl(key);
+      if (!candidate) {
+        candidate = this.getTabsByUrl(key);
+      }
       return candidate;
     }
     return null;
@@ -202,7 +206,13 @@ export class Tabs {
   }
 
   public hasUrl(url: string) {
-    return this._urlToIds.has(ensureClosingSlash(url));
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return false;
+    }
+    return this._urlToIds.has(url);
   }
 
   public has(key: string | number): boolean {
@@ -214,7 +224,7 @@ export class Tabs {
       if (!isNaN(+key) && +key > 0) {
         a = this._idToTab.has(+key);
       }
-      const b = this._urlToIds.has(ensureClosingSlash(key));
+      const b = this.hasUrl(key);
       return a || b;
     }
     return false;
@@ -289,7 +299,7 @@ export class Tabs {
       number
     >("hostToIds", stringToIdsMapUpdater);
 
-    const tabs = getTabs();
+    const tabs = Browser.getTabs();
 
     tabs.onActivated.addListener(this.activatedListener.bind(this));
     tabs.onUpdated.addListener(this.mainListener.bind(this));

@@ -1,6 +1,5 @@
 import { IVersionable } from "./interfaces";
-
-import { getTabs } from "./api";
+import { Browser } from "./api";
 
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
@@ -55,7 +54,7 @@ export class TabsManager implements IVersionable {
       Object.setPrototypeOf(this, TabsManager.prototype);
     }
 
-    const browserTabs = getTabs();
+    const browserTabs = Browser.getTabs();
 
     // Assign dynamic methods to the instance
     Object.assign(this, {
@@ -182,6 +181,7 @@ export class TabsManager implements IVersionable {
    * @param {Tab} tab - The tab to focus.
    */
   public focus(tab: Tab): void {
+    // TODO: Accept plain tab and wrap it here?
     tab.focus();
   }
 
