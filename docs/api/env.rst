@@ -2,7 +2,5 @@ Environment
 ===========
 
 .. autoclass:: Environment
+   :members:
 
-.. autofunction:: Environment.getEnvType
-
-.. autofunction:: Environment.assertEnv
