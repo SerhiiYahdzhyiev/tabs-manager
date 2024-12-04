@@ -1,4 +1,4 @@
-import { getScripting, getTabs, getDebugger } from "./api";
+import { getScripting, getTabs, getDebugger, getWindows } from "./api";
 import { Tabs } from "./tabs";
 import { withError } from "./utils";
 
@@ -82,6 +82,11 @@ export class Tab {
   }
 
   public async focus(): Promise<void> {
+    // TODO: Consider making this behaviour configurable...
+    await getWindows()?.update(this.windowId, {
+      state: "normal",
+      focused: true,
+    });
     await this._update({ active: true });
     return;
   }
