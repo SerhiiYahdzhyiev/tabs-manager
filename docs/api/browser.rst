@@ -2,11 +2,5 @@ Browser
 =======
 
 .. autoclass:: Browser
+   :members:
 
-.. autofunction:: Browser.getTabs
-
-.. autofunction:: Browser.getRuntime
-
-.. autofunction:: Browser.getScripting
-
-.. autofunction:: Browser.getDebugger
