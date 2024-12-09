@@ -7,4 +7,7 @@ API Documentation
 
    Browser <browser>
    Environment <env>
+   Tab <tab>
+   TabsManager <manager>
+   TabMaps <tab-maps>
    Utils <utils>
