@@ -81,4 +81,3 @@ export class Browser {
     return browser.windows;
   }
 }
-
