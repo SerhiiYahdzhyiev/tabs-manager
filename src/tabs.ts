@@ -5,7 +5,11 @@ import { TabMaps } from "./tab-maps";
 
 import { ITabMaps, TabsMapOneToMany } from "./types";
 
-import { simpleOneToOneMapUpdater, stringToIdsMapUpdater } from "./utils";
+import {
+  sleep,
+  simpleOneToOneMapUpdater,
+  stringToIdsMapUpdater,
+} from "./utils";
 
 export class Tabs {
   private __debug__ = false;
@@ -24,20 +28,35 @@ export class Tabs {
   private _idxToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
 
+  private _updatingIndecies = false;
+
+  private async updateIndecies() {
+    while (this._updatingIndecies) {
+      this.log("Waiting for updating indecies lock release...");
+      await sleep(100);
+    }
+    await this._updateIndecies();
+  }
+
   private async _updateIndecies() {
     this.log("Updating indecies...");
-    // INFO: Probably rebuilding the entire map is not the efficient way,
-    //       but I've struggled to write it differently without introducing
-    //       internal structures' consistency bugs...
-    // TODO: Try to write more efficient updating algorithm...
-    this._idxToTab.clear();
-    for (const tab of this._tabs) {
-      const internalIdx = tab.index;
-      this.log("Internal index: " + internalIdx);
-      const realIdx = (await Browser.getTabs().get(tab.id)).index;
-      this.log("Real index: " + realIdx);
-      tab.index = realIdx;
-      this.__maps__.updateMap("idxToTab", realIdx, tab);
+    this._updatingIndecies = true;
+    try {
+      // INFO: Probably rebuilding the entire map is not the efficient way,
+      //       but I've struggled to write it differently without introducing
+      //       internal structures' consistency bugs...
+      // TODO: Try to write more efficient updating algorithm...
+      this._idxToTab.clear();
+      for (const tab of this._tabs) {
+        const internalIdx = tab.index;
+        this.log("Internal index: " + internalIdx);
+        const realIdx = (await Browser.getTabs().get(tab.id)).index;
+        this.log("Real index: " + realIdx);
+        tab.index = realIdx;
+        this.__maps__.updateMap("idxToTab", realIdx, tab);
+      }
+    } finally {
+      this._updatingIndecies = false;
     }
   }
 
@@ -89,7 +108,7 @@ export class Tabs {
     } else {
       console.warn("Failed to get host on wrapped tab!");
     }
-    await this._updateIndecies();
+    await this.updateIndecies();
   };
 
   private updateListener = (
@@ -136,7 +155,7 @@ export class Tabs {
   };
 
   private movedListener = async () => {
-    await this._updateIndecies();
+    await this.updateIndecies();
   };
 
   private removeListener = async (id: number) => {
@@ -155,7 +174,8 @@ export class Tabs {
     if (this._urlToIds.has(url)) {
       this.__maps__.updateMap("urlToIds", url, id);
     }
-    await this._updateIndecies();
+    this.__maps__.updateMap("idToTab", id, null);
+    await this.updateIndecies();
   };
 
   public getTabById(id: number): Tab | null {
@@ -231,10 +251,18 @@ export class Tabs {
   }
 
   private async activatedListener(info: chrome.tabs.TabActiveInfo) {
-    this.log("Activating...");
+    this.log("Updating active tab...");
+    this.log("Current activateId: " + this._activeId);
+    this.log("Tab Active info: ");
+    this.log(info);
     if (this._activeId && this._activeId !== info.tabId) {
       const tab = this.get(this._activeId) as Tab;
       if (tab) {
+        await this.updateIndecies();
+        this.log("Tab:");
+        this.log(tab);
+        this.log("_tabs[tab.index]:");
+        this.log(this._tabs[tab.index]);
         this._tabs[tab.index].active = tab.active = false;
       }
     }
@@ -243,7 +271,14 @@ export class Tabs {
     const window = await chrome.windows.get(info.windowId);
     if (window.focused) {
       const tab = this.get(info.tabId) as Tab;
-      if (tab) this._tabs[tab.index].active = tab.active = true;
+      if (tab) {
+        await this.updateIndecies();
+        this.log("Tab:");
+        this.log(tab);
+        this.log("_tabs[tab.index]:");
+        this.log(this._tabs[tab.index]);
+        this._tabs[tab.index].active = tab.active = true;
+      }
     }
   }
 
