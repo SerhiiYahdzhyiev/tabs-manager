@@ -5,29 +5,19 @@ management for browser extension developers. It offers a developer-friendly API
 to interact with browser tabs, track their lifecycle, and manage them
 efficiently.
 
----
-
-This project was created as a part of the assignment from my university. I've
-implemented something similar in some other extension projects but those
-"tab managers" where more tailored to the projects' specificities and goals. In
-the current state the lib doesn't do much custom, and can be considered pretty
-much useless, but I'm planning on improving it, and I will be very happy to
-recieve suggestions and feature requrests from the community, and don't be shy
-to critic my terrible code (but try to stay constructive...) =)
-
 ## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)
   - [Initialization](#initialization)
   - [Public Methods](#public-methods)
-- [Example](#example)
+- [Sandbox Extensions](#sandbox-extensions)
 - [License](#license)
 
 ## Installation
 
-Download minified file from this repo and add it to your browser extension
-development project.
+Download minified file from this repo's releases and add it to your browser
+extension development project.
 
 For example:
 
@@ -88,10 +78,33 @@ script. Ensure your extension has the required permissions (`tabs` and
 }
 ```
 
-Then, instantiate the `TabsManager` object:
+*NOTE: Library also has some optional permissions extra functionalities:*
+
+- "scripting"
+- "debugger"
+
+*Some methods will not work without them and will yield a warning to the console.*
+*Full pack of permissions will look like this:*
+
+```json
+{
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "scripting",
+    "debugger",
+  ]
+}
+```
+
+**WARNING:** *Currently threre are some unfixed issues regarding `debugger` permission
+and methods related to it in Firefox browser!*
+
+Then, instantiate the `TabsManager` object in your extensino's code:
 
 ```javascript
-const manager = new TabsManager({});
+const manager = new TabsManager(); // Withour options...
+const my_manager = new TabsManager({name: "My Manager"}); // Withour custom name
 ```
 
 *Note:* You can create as many instances of `TabsManager` as you want, but with
@@ -186,6 +199,44 @@ Check if a tab exists by its ID or URL.
 const exists = manager.has(123);
 ```
 
+`TabsManager` instances also provide some handy getters/properties for accessing tabs:
+
+#### `tabs`
+
+Currently returns an array of `Tab` instances.
+
+Example:
+
+```javascript
+const manager = new TabsManager();
+
+manager.tabs[0]; // Access first tab
+```
+
+#### `first`
+
+Returns first `Tab`.
+
+Example:
+
+```javascript
+const manager = new TabsManager();
+
+manager.first; // Access first tab
+```
+
+#### `last`
+
+Returns last `Tab`.
+
+Example:
+
+```javascript
+const manager = new TabsManager();
+
+manager.first; // Access last tab
+```
+
 ##### TabsManager objects also have following methods from <browser|chrome>.tabs object:
     - create
     - connect
@@ -195,38 +246,61 @@ const exists = manager.has(123);
     - reload
     - update
 
-In future they will have some useful wrappers that will decorate them with
-handy capabilities...
+Their signatures in most cases are the same as in `chrome.tabs`.
 
 ### The `Tab` Class
 
 Each tab in **TabsManager** is wrapped in a `Tab` class that provides
-additional functionality:
+additional properties/getters:
 
 - `createdAt`: The timestamp when the tab was created.
 - `uptime`: Time elapsed since the tab was created.
 - `msFromLastAccessed`: Time in milliseconds since the tab was last accessed.
+- `urlObj`: Tabs url as `URL` instance.
+    - `host`
+    - `hostname`
+    - `origin`
+    - `href`
+    - `protocol`
+    - `username`
+    - `hash`
+    - `password`
+    - `pathname`
+    - `search`
+    - `searchParams` (URLSearchParams | null)
+    - `port`
 
-## Example
-
-Here’s a simple example of how to integrate **TabsManager** into your
-extension:
+From first minor version you can also call some manipulation methods on the `Tab`
+class instance directly like this:
 
 ```javascript
-const manager = new TabsManager();
+const first = manager.first;
 
-// Create a new tab
-manager.create({ url: 'https://example.com' });
-
-// Check if a tab with a specific URL exists
-if (manager.has('https://example.com')) {
-    const tab = manager.get('https://example.com');
-    console.log(`Tab found with ID: ${tab.id}`);
-}
-
-// Remove a tab by its ID
-manager.remove(123);
+await first.remove(); // Close first tab...
 ```
+
+Here is the list of available manipulation methods:
+
+- **connect(options: chrome.tas.ConnectInfo)**
+- **async clearAllInputs()**
+- **async discard()**
+- **async duplicate()**
+- **async duplicate()**
+- **async goForward()**
+- **async goBack()**
+- **async getLanguage()**
+- **async getScreenshot(options: chrome.tabs.CaptureVisibleTabOptions)**
+- **async move(options: chrome.tabs.MoveProperties)**
+- **async reload()**
+- **async remove()**
+- **async update(options: chrome.tabs.UpdateProperties)**
+- **async focus()**
+- **async forceClose()** *Requires optional permissions!*
+
+## Sandbox Extensions
+
+This repository holds some sandbox/playground extensions to test/develop
+the library. Check the nexted `README.md` file inside `__test__/ext`.
 
 ## License
 
