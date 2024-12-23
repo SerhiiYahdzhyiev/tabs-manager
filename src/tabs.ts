@@ -6,6 +6,8 @@ import { TabMaps } from "./tab-maps";
 import { TabsMapOneToMany } from "./types";
 import { ITabMaps } from "./interfaces";
 
+declare const __maps__: ITabMaps;
+
 import {
   sleep,
   simpleOneToOneMapUpdater,
@@ -16,9 +18,8 @@ export class Tabs {
   private __debug__ = false;
   private _activeId = 0;
 
-  private __maps__: ITabMaps = new TabMaps();
-
   private _urlToIds = new Map<string, number[]>();
+  private _hostToIds = new Map<string, number[]>();
   private _idToTab = new Map<number, Tab>();
   private _idxToTab = new Map<number, Tab>();
   protected _tabs: Tab[] = [];
@@ -48,14 +49,13 @@ export class Tabs {
         const realIdx = (await Browser.getTabs().get(tab.id)).index;
         this.log("Real index: " + realIdx);
         tab.index = realIdx;
-        this.__maps__.updateMap("idxToTab", realIdx, tab);
+        __maps__.updateMap("idxToTab", realIdx, tab);
       }
     } finally {
       this._updatingIndecies = false;
     }
   }
 
-  private _hostToIds = new Map<string, number[]>();
 
   private _assertTabId(tab: Tab): boolean {
     if (!tab.id) {
@@ -95,11 +95,11 @@ export class Tabs {
     }
 
     const url: string = (wrappedTab.url || wrappedTab.pendingUrl)!;
-    this.__maps__.updateMap("urlToIds", url, wrappedTab.id);
+    __maps__.updateMap("urlToIds", url, wrappedTab.id);
 
     const host = wrappedTab.urlObj?.host;
     if (host) {
-      this.__maps__.updateMap("hostToIds", host, wrappedTab.id!);
+      __maps__.updateMap("hostToIds", host, wrappedTab.id!);
     } else {
       console.warn("Failed to get host on wrapped tab!");
     }
@@ -130,14 +130,14 @@ export class Tabs {
     if (urlChanged) {
       const url: string = (tab.url || tab.pendingUrl)!;
       // INFO: Remove id from old url entry...
-      this.__maps__.updateMap("urlToIds", url, tab.id);
+      __maps__.updateMap("urlToIds", url, tab.id);
 
       const oldHost = tab.urlObj?.host;
       const newHost = new URL(changeInfo.url ?? "").host;
 
       if (newHost && newHost !== oldHost) {
-        if (oldHost) this.__maps__.updateMap("hostToIds", oldHost, tab.id!);
-        this.__maps__.updateMap("hostToIds", newHost, tab.id!);
+        if (oldHost) __maps__.updateMap("hostToIds", oldHost, tab.id!);
+        __maps__.updateMap("hostToIds", newHost, tab.id!);
       }
     }
 
@@ -145,7 +145,7 @@ export class Tabs {
 
     if (urlChanged && this._assertTabUrl(tab)) {
       const url: string = (tab.url || tab.pendingUrl)!;
-      this.__maps__.updateMap("urlToIds", url, tab.id);
+      __maps__.updateMap("urlToIds", url, tab.id);
     }
   };
 
@@ -159,7 +159,7 @@ export class Tabs {
 
     const host = oldTab?.urlObj?.host;
     if (host && this._hostToIds.has(host)) {
-      this.__maps__.updateMap("hostToIds", host, id);
+      __maps__.updateMap("hostToIds", host, id);
     } else {
       console.warn("Failed to get host removed tab!");
     }
@@ -167,9 +167,9 @@ export class Tabs {
     this._tabs = this._tabs.filter((t) => t.id !== id);
     const url = (oldTab.url || oldTab.pendingUrl)!;
     if (this._urlToIds.has(url)) {
-      this.__maps__.updateMap("urlToIds", url, id);
+      __maps__.updateMap("urlToIds", url, id);
     }
-    this.__maps__.updateMap("idToTab", id, null);
+    __maps__.updateMap("idToTab", id, null);
     await this.updateIndecies();
   };
 
@@ -291,39 +291,39 @@ export class Tabs {
     const tab = this._idToTab.get(oldId)!;
     this._idToTab.delete(oldId);
     this._idToTab.set(newId, tab);
-    this.__maps__.updateMap("urlToIds", tab.url, oldId);
-    this.__maps__.updateMap("urlToIds", tab.url, newId);
+    __maps__.updateMap("urlToIds", tab.url, oldId);
+    __maps__.updateMap("urlToIds", tab.url, newId);
     if (tab.urlObj?.host)
-      this.__maps__.updateMap("hostToIds", tab.urlObj?.host, oldId);
+      __maps__.updateMap("hostToIds", tab.urlObj?.host, oldId);
     if (tab.urlObj?.host)
-      this.__maps__.updateMap("hostToIds", tab.urlObj?.host, newId);
+      __maps__.updateMap("hostToIds", tab.urlObj?.host, newId);
   }
 
   constructor() {
-    this.__maps__.registerMap<number, Tab>("idToTab", this._idToTab);
-    this.__maps__.registerMap<number, Tab>("idxToTab", this._idxToTab);
-    this.__maps__.registerMap<string, number[]>("urlToIds", this._urlToIds);
-    this.__maps__.registerMap<string, Iterable<number>>(
+    __maps__.registerMap<number, Tab>("idToTab", this._idToTab);
+    __maps__.registerMap<number, Tab>("idxToTab", this._idxToTab);
+    __maps__.registerMap<string, number[]>("urlToIds", this._urlToIds);
+    __maps__.registerMap<string, Iterable<number>>(
       "hostToIds",
       this._hostToIds,
     );
 
-    this.__maps__.registerUpdater<Map<number, Tab>, number, Tab>(
+    __maps__.registerUpdater<Map<number, Tab>, number, Tab>(
       "idToTab",
       simpleOneToOneMapUpdater,
     );
 
-    this.__maps__.registerUpdater<Map<number, Tab>, number, Tab>(
+    __maps__.registerUpdater<Map<number, Tab>, number, Tab>(
       "idxToTab",
       simpleOneToOneMapUpdater,
     );
 
-    this.__maps__.registerUpdater<Map<string, number[]>, string, number>(
+    __maps__.registerUpdater<Map<string, number[]>, string, number>(
       "urlToIds",
       stringToIdsMapUpdater,
     );
 
-    this.__maps__.registerUpdater<
+    __maps__.registerUpdater<
       TabsMapOneToMany<string, number>,
       string,
       number
@@ -349,10 +349,10 @@ export class Tabs {
         const url = (tab.url || tab.pendingUrl)!;
         const host = new URL(url).host;
         if (host) {
-          this.__maps__.updateMap("hostToIds", host, tab.id!);
+          __maps__.updateMap("hostToIds", host, tab.id!);
         }
-        this.__maps__.updateMap("urlToIds", url, tab.id!);
-        this.__maps__.updateMap("idxToTab", tab.index, tab);
+        __maps__.updateMap("urlToIds", url, tab.id!);
+        __maps__.updateMap("idxToTab", tab.index, tab);
       });
     });
     Object.assign(this, {
