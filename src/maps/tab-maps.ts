@@ -14,6 +14,30 @@ export class TabMaps implements ITabMaps {
     updater(map, key, value);
   }
 
+  public entries(name: string) {
+    if (!this._maps.has(name)) {
+      // TODO: Replace with custom error
+      throw new Error("No map registered with name: " + name);
+    }
+    return this._maps.get(name).entries();
+  }
+
+  public getValue<K, V>(name: string, key: K): V | undefined {
+    if (!this._maps.has(name)) {
+      // TODO: Replace with custom error
+      throw new Error("No map registered with name: " + name);
+    }
+    return this._maps.get(name).get(key) || undefined;
+  }
+
+  public hasKey<K>(name: string, key: K): boolean {
+    if (!this._maps.has(name)) {
+      // TODO: Replace with custom error
+      throw new Error("No map registered with name: " + name);
+    }
+    return this._maps.get(name).has(key);
+  }
+
   public updateMap<K, V>(name: string, key: K, value: V) {
     if (!this._maps.has(name)) {
       // TODO: Replace with custom error
@@ -46,5 +70,13 @@ export class TabMaps implements ITabMaps {
       throw new Error("Duplicate updater for: " + name);
     }
     this._updaters.set(name, updater);
+  }
+
+  public clearMap(name: string) {
+    if (!this._maps.has(name)) {
+      // TODO: Replace with custom error
+      throw new Error("No map registered with name: " + name);
+    }
+    this._maps.get(name).clear();
   }
 }
