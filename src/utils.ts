@@ -1,7 +1,5 @@
 import { TabsMapUpdater } from "./types";
 
-declare let InstallTrigger: object;
-
 /**
  * Return passed string with a '/' in the end.
  *
