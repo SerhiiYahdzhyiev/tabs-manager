@@ -81,7 +81,7 @@ export class TabsManager implements IVersionable {
     };
   }
 
-  public getActive(): Tab | null {
+  public get active(): Tab | null {
     if (_tabs.activeId) {
       return _tabs.get(_tabs.activeId) as Tab;
     }
