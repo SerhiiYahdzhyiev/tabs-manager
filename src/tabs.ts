@@ -15,12 +15,6 @@ import {
 export class Tabs {
   private __debug__ = false;
   private _activeId = 0;
-  // NOTE: Currently not in use, may by refined/rethinked later...
-  private static __mapNames__ = new Set<string>([
-    "idToTab",
-    "urlToIds",
-    "hostToTab",
-  ]);
 
   private __maps__: ITabMaps = new TabMaps();
 
