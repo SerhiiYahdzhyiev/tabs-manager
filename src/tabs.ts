@@ -1,7 +1,6 @@
 import { Browser } from "./api";
 
 import { Tab } from "./tab";
-import { TabMaps } from "./tab-maps";
 
 import { TabsMapOneToMany } from "./types";
 import { ITabMaps } from "./interfaces";
@@ -55,7 +54,6 @@ export class Tabs {
       this._updatingIndecies = false;
     }
   }
-
 
   private _assertTabId(tab: Tab): boolean {
     if (!tab.id) {
@@ -323,11 +321,10 @@ export class Tabs {
       stringToIdsMapUpdater,
     );
 
-    __maps__.registerUpdater<
-      TabsMapOneToMany<string, number>,
-      string,
-      number
-    >("hostToIds", stringToIdsMapUpdater);
+    __maps__.registerUpdater<TabsMapOneToMany<string, number>, string, number>(
+      "hostToIds",
+      stringToIdsMapUpdater,
+    );
 
     const tabs = Browser.getTabs();
 

@@ -16,4 +16,3 @@ export type TabsMapUpdater<MapType, K, V> = (
   key: K,
   value: V | null,
 ) => void;
-

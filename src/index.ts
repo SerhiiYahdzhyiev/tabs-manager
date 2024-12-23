@@ -5,7 +5,7 @@ import { Browser } from "./api";
 
 import { Tabs } from "./tabs";
 import { TabsManager } from "./manager";
-import { TabMaps } from "./tab-maps";
+import { initMaps } from "./maps/init-maps";
 
 const requiredPermissions = ["tabs", "activeTab"];
 
@@ -29,9 +29,10 @@ const requiredPermissions = ["tabs", "activeTab"];
   }
 
   // INFO: Globals assignment...
-  Object.assign(globalThis, { __maps__: new TabMaps() });
   Object.assign(globalThis, { envType: Environment.getEnvType() });
   Object.assign(globalThis, { _tabs: new Tabs() });
+
+  initMaps();
 
   Object.assign(globalThis, { TabsManager: TabsManager });
 })();
