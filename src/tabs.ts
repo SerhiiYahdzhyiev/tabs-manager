@@ -3,7 +3,8 @@ import { Browser } from "./api";
 import { Tab } from "./tab";
 import { TabMaps } from "./tab-maps";
 
-import { ITabMaps, TabsMapOneToMany } from "./types";
+import { TabsMapOneToMany } from "./types";
+import { ITabMaps } from "./interfaces";
 
 import {
   sleep,

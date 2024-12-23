@@ -1,4 +1,5 @@
-import { ITabMaps, TabsMap, TabsMapUpdater } from "./types";
+import { TabsMap, TabsMapUpdater } from "./types";
+import {ITabMaps} from "./interfaces";
 
 export class TabMaps implements ITabMaps {
   private _maps = new Map();
