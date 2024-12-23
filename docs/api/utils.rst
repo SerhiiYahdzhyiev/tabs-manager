@@ -7,4 +7,6 @@ Utils
 
 .. autofunction:: stringToIdsMapUpdater
 
+.. autofunction:: isFirefox
+
 .. autofunction:: withError
