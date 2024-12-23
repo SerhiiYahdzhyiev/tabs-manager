@@ -11,7 +11,7 @@ declare let _tabs: Tabs;
 export class TabsManager implements IVersionable {
   // TODO: Realize version insertion from build system
   //       in a format of a hex digit.
-  private static __version__ = "0.1.0";
+  private static __version__ = "0.1.1";
 
   public static get version(): string {
     return this.__version__;

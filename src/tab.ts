@@ -1,6 +1,6 @@
 import { Browser } from "./api";
 import { Tabs } from "./tabs";
-import { withError } from "./utils";
+import { isFirefox, withError } from "./utils";
 
 import clearAllInputs from "./scripts/clearAllInputs";
 
@@ -150,6 +150,12 @@ export class Tab {
   }
 
   public async forceClose(): Promise<void> {
+    if (isFirefox()) {
+      const message = "This method is not supported on Firefox!";
+      console.warn(message);
+      throw new Error(message);
+    }
+
     const deb = Browser.getDebugger();
     if (!deb) throw new Error("Debugger is not permitted or/and available!");
 
