@@ -15,6 +15,7 @@ const config = () => ({
         file: "dist/tabs-manager.js",
         format: "iife",
         plugins: isProduction ? [terser(terserOptions)] : [],
+        sourcemap: !isProduction,
     },
 });
 
