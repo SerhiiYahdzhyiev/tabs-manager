@@ -1,5 +1,6 @@
 import { Browser } from "./api";
 import { Tabs } from "./tabs";
+
 import { isFirefox, withError } from "./utils";
 
 import clearAllInputs from "./scripts/clearAllInputs";
@@ -20,6 +21,7 @@ export class Tab {
   //TODO: Improve typehints...
   connect: CallableFunction;
   clearAllInputs: CallableFunction;
+  close: CallableFunction;
   discard: CallableFunction;
   duplicate: CallableFunction;
   getLanguage: CallableFunction;
@@ -71,7 +73,7 @@ export class Tab {
     );
     this.move = this._withRemoved(withError(this._move.bind(this)));
     this.reload = this._withRemoved(withError(this._reload.bind(this)));
-    this.remove = this._withRemoved(
+    this.remove = this.close = this._withRemoved(
       this._withRemoved(withError(this._remove.bind(this))),
     );
     this.update = this._withRemoved(withError(this._update.bind(this)));
