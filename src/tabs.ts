@@ -9,7 +9,7 @@ import { sleep } from "./utils";
 declare const __maps__: ITabMaps;
 
 export class Tabs {
-  private __debug__ = true;
+  private __debug__ = false;
   private _activeId = 0;
 
   protected _tabs: Tab[] = [];
