@@ -15,7 +15,7 @@ const requiredPermissions = ["tabs", "activeTab"];
 
 (() => {
   if (!Environment.assertEnv(Environment.getEnvType())) {
-    console.warn("This environment is not suitable for TabsManager!");
+    console.error("This environment is not suitable for TabsManager!");
     return 1;
   }
 
@@ -26,7 +26,7 @@ const requiredPermissions = ["tabs", "activeTab"];
   );
 
   if (!requiredPermissionsGranted) {
-    console.warn(
+    console.error(
       "This extension does not have a required permissions for TabsManager!",
     );
     return 1;
