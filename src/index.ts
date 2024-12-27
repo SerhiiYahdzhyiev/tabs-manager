@@ -33,6 +33,7 @@ const requiredPermissions = ["tabs", "activeTab"];
   }
 
   // INFO: Globals assignment...
+  Object.assign(globalThis, { __tabs__: [] });
   Object.assign(globalThis, { envType: Environment.getEnvType() });
   Object.assign(globalThis, { _tabs: new Tabs() });
 

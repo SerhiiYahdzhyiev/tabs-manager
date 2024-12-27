@@ -7,12 +7,11 @@ import { ITabMaps } from "./interfaces";
 import { sleep } from "./utils";
 
 declare const __maps__: ITabMaps;
+declare let __tabs__: Tab[];
 
 export class Tabs {
   private __debug__ = false;
   private _activeId = 0;
-
-  public _tabs: Tab[] = [];
 
   private _updatingIndecies = false;
 
@@ -33,7 +32,7 @@ export class Tabs {
       //       internal structures' consistency bugs...
       // TODO: Try to write more efficient updating algorithm...
       __maps__.clearMap("idxToTab");
-      for (const tab of this._tabs) {
+      for (const tab of __tabs__) {
         const internalIdx = tab.index;
         this.log("Internal index: " + internalIdx);
         const realIdx = (await Browser.getTabs().get(tab.id)).index;
@@ -122,7 +121,8 @@ export class Tabs {
       console.warn("Failed to get host removed tab!");
     }
 
-    this._tabs = this._tabs.filter((t) => t.id !== id);
+    __tabs__ = __tabs__.filter((t) => t.id !== id);
+
     const url = (oldTab.url || oldTab.pendingUrl)!;
     if (__maps__.hasKey("urlToIds", url)) {
       __maps__.updateMap("urlToIds", url, id);
@@ -215,8 +215,8 @@ export class Tabs {
         this.log("Tab:");
         this.log(tab);
         this.log("_tabs[tab.index]:");
-        this.log(this._tabs[tab.index]);
-        this._tabs[tab.index].active = tab.active = false;
+        this.log(__tabs__[tab.index]);
+        __tabs__[tab.index].active = tab.active = false;
       }
     }
     this._activeId = info.tabId;
@@ -229,8 +229,8 @@ export class Tabs {
         this.log("Tab:");
         this.log(tab);
         this.log("_tabs[tab.index]:");
-        this.log(this._tabs[tab.index]);
-        this._tabs[tab.index].active = tab.active = true;
+        this.log(__tabs__[tab.index]);
+        __tabs__[tab.index].active = tab.active = true;
       }
     }
   }
@@ -268,8 +268,8 @@ export class Tabs {
     tabs.onMoved.addListener(this.movedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
-      this._tabs = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
-      this._tabs.forEach((tab: Tab) => {
+      __tabs__ = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
+      __tabs__.forEach((tab: Tab) => {
         if (tab.active) {
           this._activeId = tab.id;
         }
@@ -297,7 +297,7 @@ export class Tabs {
   }
 
   get last(): Tab {
-    return __maps__.getValue<number, Tab>("idxToTab", this._tabs.length - 1)!;
+    return __maps__.getValue<number, Tab>("idxToTab", __tabs__.length - 1)!;
   }
 
   get first(): Tab {
