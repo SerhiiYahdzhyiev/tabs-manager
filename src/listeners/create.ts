@@ -1,10 +1,8 @@
 import { Tab } from "../tab";
-import { Tabs } from "../tabs";
 import { ITabMaps } from "../interfaces";
 
 import { ListenerFunction, TListenerFunction } from "./base";
 
-declare const _tabs: Tabs;
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
 declare let _idxUpdateLock: number;
@@ -15,7 +13,7 @@ async function createListener(this: TListenerFunction, tab: chrome.tabs.Tab) {
   const wrappedTab = new Tab(tab);
   __tabs__ = [...__tabs__, wrappedTab];
   __maps__.updateMap("idxToTab", __tabs__.length - 1, wrappedTab);
-  if (!_tabs._assertTabId(wrappedTab)) {
+  if (!wrappedTab.id) {
     console.warn("Skipping tab without id!");
     console.warn("This tab will not be saved in id->tab map!");
     console.dir(tab);
@@ -23,7 +21,7 @@ async function createListener(this: TListenerFunction, tab: chrome.tabs.Tab) {
   }
   __maps__.updateMap("idToTab", tab.id!, wrappedTab);
 
-  if (!_tabs._assertTabUrl(wrappedTab)) {
+  if (!wrappedTab.url && !wrappedTab.pendingUrl) {
     console.warn("Skipping tab without both url and pendingUrl!");
     console.warn("This tab will not be saved in url->tab map!");
     return;

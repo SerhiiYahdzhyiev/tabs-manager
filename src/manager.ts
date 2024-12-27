@@ -1,4 +1,4 @@
-import { IVersionable } from "./interfaces";
+import { ITabMaps, IVersionable } from "./interfaces";
 import { Browser } from "./api";
 
 import { Tabs } from "./tabs";
@@ -6,7 +6,9 @@ import { Tab } from "./tab";
 
 import { sleep } from "./utils";
 
+declare const __maps__: ITabMaps;
 declare let _tabs: Tabs;
+declare let _activeId: number;
 
 export class TabsManager implements IVersionable {
   // TODO: Realize version insertion from build system
@@ -20,6 +22,7 @@ export class TabsManager implements IVersionable {
   get version(): string {
     return TabsManager.version;
   }
+
   private _name: string = "default";
 
   constructor(options: Record<string, string>) {
@@ -82,8 +85,8 @@ export class TabsManager implements IVersionable {
   }
 
   public get active(): Tab | null {
-    if (_tabs.activeId) {
-      return _tabs.get(_tabs.activeId) as Tab;
+    if (_activeId) {
+      return __maps__.getValue<number, Tab>("idToTab", _activeId) ?? null;
     }
     return null;
   }

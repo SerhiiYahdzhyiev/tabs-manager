@@ -8,6 +8,7 @@ import { sleep } from "./utils";
 
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
+declare let _activeId: number;
 
 export class Tabs {
   private __debug__ = false;
@@ -110,7 +111,6 @@ export class Tabs {
     await this.updateIndecies();
   };
 
-
   public getTabById(id: number): Tab | null {
     return __maps__.getValue("idToTab", id) || null;
   }
@@ -183,38 +183,6 @@ export class Tabs {
     return false;
   }
 
-  private async activatedListener(info: chrome.tabs.TabActiveInfo) {
-    this.log("Updating active tab...");
-    this.log("Current activateId: " + this._activeId);
-    this.log("Tab Active info: ");
-    this.log(info);
-    if (this._activeId && this._activeId !== info.tabId) {
-      const tab = this.get(this._activeId) as Tab;
-      if (tab) {
-        await this.updateIndecies();
-        this.log("Tab:");
-        this.log(tab);
-        this.log("_tabs[tab.index]:");
-        this.log(__tabs__[tab.index]);
-        __tabs__[tab.index].active = tab.active = false;
-      }
-    }
-    this._activeId = info.tabId;
-    // TODO: Add ability to configure this behaviour
-    const window = await chrome.windows.get(info.windowId);
-    if (window.focused) {
-      const tab = this.get(info.tabId) as Tab;
-      if (tab) {
-        await this.updateIndecies();
-        this.log("Tab:");
-        this.log(tab);
-        this.log("_tabs[tab.index]:");
-        this.log(__tabs__[tab.index]);
-        __tabs__[tab.index].active = tab.active = true;
-      }
-    }
-  }
-
   private mainListener() {
     for (const [k, ids] of __maps__.entries<string, number[]>("hostToIds")) {
       if (!ids.length) {
@@ -240,7 +208,6 @@ export class Tabs {
   constructor() {
     const tabs = Browser.getTabs();
 
-    tabs.onActivated.addListener(this.activatedListener.bind(this));
     tabs.onUpdated.addListener(this.mainListener.bind(this));
     tabs.onRemoved.addListener(this.mainListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
@@ -250,7 +217,7 @@ export class Tabs {
       __tabs__ = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
       __tabs__.forEach((tab: Tab) => {
         if (tab.active) {
-          this._activeId = tab.id;
+          this._activeId = _activeId = tab.id;
         }
         __maps__.updateMap("idToTab", tab.id!, tab);
         const url = (tab.url || tab.pendingUrl)!;
