@@ -1,6 +1,7 @@
 "use strict";
 
 Object.assign(globalThis, { __debug__: true });
+Object.assign(globalThis, { _idxUpdateLock: 0 });
 
 import { Environment } from "./env";
 import { Browser } from "./api";

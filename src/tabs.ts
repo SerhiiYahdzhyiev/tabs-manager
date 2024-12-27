@@ -110,26 +110,6 @@ export class Tabs {
     await this.updateIndecies();
   };
 
-  private removeListener = async (id: number) => {
-    this.log("Removed!");
-    const oldTab = this.getTabById(id)!;
-
-    const host = oldTab?.urlObj?.host;
-    if (host && __maps__.hasKey("hostToIds", host)) {
-      __maps__.updateMap("hostToIds", host, id);
-    } else {
-      console.warn("Failed to get host removed tab!");
-    }
-
-    __tabs__ = __tabs__.filter((t) => t.id !== id);
-
-    const url = (oldTab.url || oldTab.pendingUrl)!;
-    if (__maps__.hasKey("urlToIds", url)) {
-      __maps__.updateMap("urlToIds", url, id);
-    }
-    __maps__.updateMap("idToTab", id, null);
-    await this.updateIndecies();
-  };
 
   public getTabById(id: number): Tab | null {
     return __maps__.getValue("idToTab", id) || null;
@@ -264,7 +244,6 @@ export class Tabs {
     tabs.onUpdated.addListener(this.mainListener.bind(this));
     tabs.onRemoved.addListener(this.mainListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
-    tabs.onRemoved.addListener(this.removeListener.bind(this));
     tabs.onMoved.addListener(this.movedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {

@@ -7,9 +7,11 @@ import { ListenerFunction, TListenerFunction } from "./base";
 declare const _tabs: Tabs;
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
+declare let _idxUpdateLock: number;
 
 async function createListener(this: TListenerFunction, tab: chrome.tabs.Tab) {
   this.debug("Created!");
+  _idxUpdateLock++;
   const wrappedTab = new Tab(tab);
   __tabs__ = [...__tabs__, wrappedTab];
   __maps__.updateMap("idxToTab", __tabs__.length - 1, wrappedTab);
@@ -36,7 +38,7 @@ async function createListener(this: TListenerFunction, tab: chrome.tabs.Tab) {
   } else {
     console.warn("Failed to get host on wrapped tab!");
   }
-  await _tabs.updateIndecies();
+  _idxUpdateLock--;
 }
 
 Object.setPrototypeOf(createListener, ListenerFunction);
