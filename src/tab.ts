@@ -32,6 +32,12 @@ export class Tab {
   update: CallableFunction;
 
   private _removed = false;
+  public get removed() {
+    return this._removed;
+  }
+  public get closed() {
+    return this._removed;
+  }
 
   private _withRemoved(cb: CallableFunction) {
     return (...args: unknown[]) => {
