@@ -1,5 +1,7 @@
 "use strict";
 
+Object.assign(globalThis, { __debug__: true });
+
 import { Environment } from "./env";
 import { Browser } from "./api";
 
