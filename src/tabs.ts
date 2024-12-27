@@ -12,11 +12,11 @@ export class Tabs {
   private __debug__ = false;
   private _activeId = 0;
 
-  protected _tabs: Tab[] = [];
+  public _tabs: Tab[] = [];
 
   private _updatingIndecies = false;
 
-  private async updateIndecies() {
+  public async updateIndecies() {
     while (this._updatingIndecies) {
       this.log("Waiting for updating indecies lock release...");
       await sleep(100);
@@ -46,14 +46,14 @@ export class Tabs {
     }
   }
 
-  private _assertTabId(tab: Tab): boolean {
+  public _assertTabId(tab: Tab): boolean {
     if (!tab.id) {
       return false;
     }
     return true;
   }
 
-  private _assertTabUrl(tab: Tab): boolean {
+  public _assertTabUrl(tab: Tab): boolean {
     if (!tab.url && !tab.pendingUrl) {
       return false;
     }
@@ -63,37 +63,6 @@ export class Tabs {
   private log(...args: unknown[]) {
     if (this.__debug__) console.log(...args);
   }
-
-  private createListener = async (tab: chrome.tabs.Tab) => {
-    this.log("Created!");
-    const wrappedTab = new Tab(tab);
-    this._tabs = [...this._tabs, wrappedTab];
-    __maps__.updateMap("idxToTab", this._tabs.length - 1, wrappedTab);
-    if (!this._assertTabId(wrappedTab)) {
-      console.warn("Skipping tab without id!");
-      console.warn("This tab will not be saved in id->tab map!");
-      console.dir(tab);
-      return;
-    }
-    __maps__.updateMap("idToTab", tab.id!, wrappedTab);
-
-    if (!this._assertTabUrl(wrappedTab)) {
-      console.warn("Skipping tab without both url and pendingUrl!");
-      console.warn("This tab will not be saved in url->tab map!");
-      return;
-    }
-
-    const url: string = (wrappedTab.url || wrappedTab.pendingUrl)!;
-    __maps__.updateMap("urlToIds", url, wrappedTab.id);
-
-    const host = wrappedTab.urlObj?.host;
-    if (host) {
-      __maps__.updateMap("hostToIds", host, wrappedTab.id!);
-    } else {
-      console.warn("Failed to get host on wrapped tab!");
-    }
-    await this.updateIndecies();
-  };
 
   private updateListener = (
     id: number,
@@ -294,7 +263,6 @@ export class Tabs {
     tabs.onActivated.addListener(this.activatedListener.bind(this));
     tabs.onUpdated.addListener(this.mainListener.bind(this));
     tabs.onRemoved.addListener(this.mainListener.bind(this));
-    tabs.onCreated.addListener(this.createListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
     tabs.onRemoved.addListener(this.removeListener.bind(this));
     tabs.onMoved.addListener(this.movedListener.bind(this));

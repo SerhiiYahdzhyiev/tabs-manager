@@ -7,7 +7,9 @@ import { Browser } from "./api";
 
 import { Tabs } from "./tabs";
 import { TabsManager } from "./manager";
+
 import { initMaps } from "./maps/init-maps";
+import { initListeners } from "./listeners/init";
 
 const requiredPermissions = ["tabs", "activeTab"];
 
@@ -35,6 +37,7 @@ const requiredPermissions = ["tabs", "activeTab"];
   Object.assign(globalThis, { _tabs: new Tabs() });
 
   initMaps();
+  initListeners();
 
   Object.assign(globalThis, { TabsManager: TabsManager });
 })();
