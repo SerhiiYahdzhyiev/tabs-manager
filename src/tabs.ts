@@ -1,7 +1,5 @@
 import { Browser } from "./api";
-
 import { Tab } from "./tab";
-
 import { ITabMaps } from "./interfaces";
 
 declare const __maps__: ITabMaps;
@@ -94,30 +92,6 @@ export class Tabs {
       __maps__.updateMap("hostToIds", tab.urlObj?.host, oldId);
     if (tab.urlObj?.host)
       __maps__.updateMap("hostToIds", tab.urlObj?.host, newId);
-  }
-
-  constructor() {
-    const tabs = Browser.getTabs();
-
-    tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
-      __tabs__ = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
-      __tabs__.forEach((tab: Tab) => {
-        if (tab.active) {
-          this._activeId = _activeId = tab.id;
-        }
-        __maps__.updateMap("idToTab", tab.id!, tab);
-        const url = (tab.url || tab.pendingUrl)!;
-        const host = new URL(url).host;
-        if (host) {
-          __maps__.updateMap("hostToIds", host, tab.id!);
-        }
-        __maps__.updateMap("urlToIds", url, tab.id!);
-        __maps__.updateMap("idxToTab", tab.index, tab);
-      });
-    });
-    Object.assign(this, {
-      [Symbol.toStringTag]: `Tabs`,
-    });
   }
 
   get tabs(): Tab[] {
