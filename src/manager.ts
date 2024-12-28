@@ -8,6 +8,7 @@ import { sleep } from "./utils/process";
 
 declare const __maps__: ITabMaps;
 declare let _tabs: Tabs;
+declare let __tabs__: Tab[];
 declare let _activeId: number;
 
 export class TabsManager implements IVersionable {
@@ -39,7 +40,7 @@ export class TabsManager implements IVersionable {
       create: async (props: chrome.tabs.CreateProperties = {}) => {
         await browserTabs.create(props);
         await sleep(200);
-        return _tabs.tabs[_tabs.tabs.length - 1];
+        return __tabs__[__tabs__.length - 1];
       },
       connect: browserTabs.connect,
       // TODO: Refactor?..
@@ -80,7 +81,7 @@ export class TabsManager implements IVersionable {
     cb: <TArgs>(tabs: Tab[], ...args: TArgs[]) => ReturnType,
   ): <TArgs>(...args: TArgs[]) => ReturnType {
     return <TArgs>(...args: TArgs[]) => {
-      return cb(_tabs.tabs, ...args);
+      return cb(__tabs__, ...args);
     };
   }
 
@@ -92,7 +93,7 @@ export class TabsManager implements IVersionable {
   }
 
   public getAll(): Tab[] {
-    return _tabs.tabs;
+    return __tabs__;
   }
 
   public get(key: string | number): Tab | Tab[] | null {
@@ -110,20 +111,24 @@ export class TabsManager implements IVersionable {
 
   public get tabs(): Tab[] {
     // INFO: Temporary realization, will be changed to respect filters...
-    return _tabs.tabs;
-  }
-
-  public get first(): Tab {
-    // WARN: This is temporary solution
-    // TODO: Replace with first element of fileterd tabs list of current
-    //       manager.
-    return _tabs.first;
+    const _tabs = [];
+    for (const [i, t] of __maps__.entries<number, Tab>("idxToTab")) {
+      _tabs[i] = t;
+    }
+    return _tabs;
   }
 
   public get last(): Tab {
     // WARN: This is temporary solution
     // TODO: Replace with first element of fileterd tabs list of current
     //       manager.
-    return _tabs.last;
+    return __maps__.getValue<number, Tab>("idxToTab", __tabs__.length - 1)!;
+  }
+
+  public get first(): Tab {
+    // WARN: This is temporary solution
+    // TODO: Replace with first element of fileterd tabs list of current
+    //       manager.
+    return __maps__.getValue<number, Tab>("idxToTab", 0)!;
   }
 }

@@ -1,14 +1,9 @@
-import { Browser } from "./api";
 import { Tab } from "./tab";
 import { ITabMaps } from "./interfaces";
 
 declare const __maps__: ITabMaps;
-declare let __tabs__: Tab[];
-declare let _activeId: number;
 
 export class Tabs {
-  private _activeId = 0;
-
   public getTabById(id: number): Tab | null {
     return __maps__.getValue("idToTab", id) || null;
   }
@@ -92,28 +87,5 @@ export class Tabs {
       __maps__.updateMap("hostToIds", tab.urlObj?.host, oldId);
     if (tab.urlObj?.host)
       __maps__.updateMap("hostToIds", tab.urlObj?.host, newId);
-  }
-
-  get tabs(): Tab[] {
-    const _tabs = [];
-    for (const [i, t] of __maps__.entries<number, Tab>("idxToTab")) {
-      _tabs[i] = t;
-    }
-    return _tabs;
-  }
-
-  get last(): Tab {
-    return __maps__.getValue<number, Tab>("idxToTab", __tabs__.length - 1)!;
-  }
-
-  get first(): Tab {
-    return __maps__.getValue<number, Tab>("idxToTab", 0)!;
-  }
-
-  get activeId(): number {
-    if (this._activeId) {
-      return this._activeId;
-    }
-    return 0;
   }
 }
