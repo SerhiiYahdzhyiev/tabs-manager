@@ -145,15 +145,6 @@ export class Tabs {
     return false;
   }
 
-  private mainListener() {
-    for (const [k, ids] of __maps__.entries<string, number[]>("hostToIds")) {
-      if (!ids.length) {
-        this.log("Deleting ", k);
-        __maps__.updateMap("hostToIds", k, null);
-      }
-    }
-  }
-
   public discard(oldId: number, newId: number) {
     // TODO: Refactor?..
     const tab = __maps__.getValue<number, Tab>("idToTab", oldId)!;
@@ -170,8 +161,6 @@ export class Tabs {
   constructor() {
     const tabs = Browser.getTabs();
 
-    tabs.onUpdated.addListener(this.mainListener.bind(this));
-    tabs.onRemoved.addListener(this.mainListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
