@@ -14,38 +14,6 @@ export class Tabs {
   private __debug__ = false;
   private _activeId = 0;
 
-  private _updatingIndecies = false;
-
-  public async updateIndecies() {
-    while (this._updatingIndecies) {
-      this.log("Waiting for updating indecies lock release...");
-      await sleep(100);
-    }
-    await this._updateIndecies();
-  }
-
-  private async _updateIndecies() {
-    this.log("Updating indecies...");
-    this._updatingIndecies = true;
-    try {
-      // INFO: Probably rebuilding the entire map is not the efficient way,
-      //       but I've struggled to write it differently without introducing
-      //       internal structures' consistency bugs...
-      // TODO: Try to write more efficient updating algorithm...
-      __maps__.clearMap("idxToTab");
-      for (const tab of __tabs__) {
-        const internalIdx = tab.index;
-        this.log("Internal index: " + internalIdx);
-        const realIdx = (await Browser.getTabs().get(tab.id)).index;
-        this.log("Real index: " + realIdx);
-        tab.index = realIdx;
-        __maps__.updateMap("idxToTab", realIdx, tab);
-      }
-    } finally {
-      this._updatingIndecies = false;
-    }
-  }
-
   public _assertTabId(tab: Tab): boolean {
     if (!tab.id) {
       return false;
@@ -105,10 +73,6 @@ export class Tabs {
       const url: string = (tab.url || tab.pendingUrl)!;
       __maps__.updateMap("urlToIds", url, tab.id);
     }
-  };
-
-  private movedListener = async () => {
-    await this.updateIndecies();
   };
 
   public getTabById(id: number): Tab | null {
@@ -211,7 +175,6 @@ export class Tabs {
     tabs.onUpdated.addListener(this.mainListener.bind(this));
     tabs.onRemoved.addListener(this.mainListener.bind(this));
     tabs.onUpdated.addListener(this.updateListener.bind(this));
-    tabs.onMoved.addListener(this.movedListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
       __tabs__ = tabs.map((t: chrome.tabs.Tab) => new Tab(t));

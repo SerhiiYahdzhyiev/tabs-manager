@@ -18,4 +18,6 @@ export function initListeners() {
 
   tabs.onRemoved.addListener(remove);
   tabs.onRemoved.addListener(updateIndexes);
+
+  tabs.onMoved.addListener(updateIndexes);
 }
