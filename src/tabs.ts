@@ -9,55 +9,7 @@ declare let __tabs__: Tab[];
 declare let _activeId: number;
 
 export class Tabs {
-  private __debug__ = true;
   private _activeId = 0;
-
-  private log(...args: unknown[]) {
-    if (this.__debug__) console.log(...args);
-  }
-
-  private updateListener = (
-    id: number,
-    changeInfo: chrome.tabs.TabChangeInfo,
-  ) => {
-    this.log("Updated!");
-    this.log(id, changeInfo);
-
-    const discarded =
-      "discarded" in changeInfo && changeInfo.discarded === true;
-
-    if (discarded) return;
-
-    const urlChanged = "url" in changeInfo || "pendingUrl" in changeInfo;
-
-    if (!this.hasId(id)) {
-      console.warn(id);
-      throw Error("Failed to find updated tab by id!");
-    }
-
-    const tab = this.getTabById(id)!;
-
-    if (urlChanged) {
-      const url: string = (tab.url || tab.pendingUrl)!;
-      // INFO: Remove id from old url entry...
-      __maps__.updateMap("urlToIds", url, tab.id);
-
-      const oldHost = tab.urlObj?.host;
-      const newHost = new URL(changeInfo.url ?? "").host;
-
-      if (newHost && newHost !== oldHost) {
-        if (oldHost) __maps__.updateMap("hostToIds", oldHost, tab.id!);
-        __maps__.updateMap("hostToIds", newHost, tab.id!);
-      }
-    }
-
-    Object.assign(tab, changeInfo);
-
-    if (urlChanged && (tab.url || tab.pendingUrl)) {
-      const url: string = (tab.url || tab.pendingUrl)!;
-      __maps__.updateMap("urlToIds", url, tab.id);
-    }
-  };
 
   public getTabById(id: number): Tab | null {
     return __maps__.getValue("idToTab", id) || null;
@@ -146,8 +98,6 @@ export class Tabs {
 
   constructor() {
     const tabs = Browser.getTabs();
-
-    tabs.onUpdated.addListener(this.updateListener.bind(this));
 
     tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
       __tabs__ = tabs.map((t: chrome.tabs.Tab) => new Tab(t));
