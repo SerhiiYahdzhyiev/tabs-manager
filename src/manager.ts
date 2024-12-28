@@ -4,7 +4,7 @@ import { Browser } from "./api";
 import { Tabs } from "./tabs";
 import { Tab } from "./tab";
 
-import { sleep } from "./utils";
+import { sleep } from "./utils/process";
 
 declare const __maps__: ITabMaps;
 declare let _tabs: Tabs;

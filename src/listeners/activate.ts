@@ -2,7 +2,7 @@ import { Tab } from "../tab";
 import { ITabMaps } from "../interfaces";
 import { ListenerFunction, TListenerFunction } from "./base";
 
-import { sleep } from "../utils";
+import { sleep } from "../utils/process";
 
 declare const __maps__: ITabMaps;
 declare let _activeId: number;

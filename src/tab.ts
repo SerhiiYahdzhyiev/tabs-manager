@@ -1,7 +1,7 @@
 import { Browser } from "./api";
 import { Tabs } from "./tabs";
 
-import { isFirefox, withError } from "./utils";
+import { isFirefox, withError } from "./utils/process";
 
 import clearAllInputs from "./scripts/clearAllInputs";
 
