@@ -46,7 +46,7 @@ export class TabsManager implements IVersionable {
       // TODO: Refactor?..
       discard: async (tabId: number) => {
         const tab = await browserTabs.discard(tabId);
-        const oldTab = _tabs.getTabById(tabId)!;
+        const oldTab = __maps__.getValue("idToTab", tabId)!;
         _tabs.discard(tabId, tab.id!);
         Object.assign(oldTab, tab);
         return oldTab;
@@ -68,7 +68,7 @@ export class TabsManager implements IVersionable {
         // TODO: Consider getting the same functionality done without using
         //       sleeps...
         await sleep(200);
-        return _tabs.get(updated.id!) as Tab;
+        return this._get(updated.id!) as Tab;
       },
     });
 
@@ -97,11 +97,71 @@ export class TabsManager implements IVersionable {
   }
 
   public get(key: string | number): Tab | Tab[] | null {
-    return _tabs.get(key);
+    return this._get(key);
+  }
+
+  public _get(key: string | number): Tab | Tab[] | null {
+    if (typeof key === "number") {
+      return __maps__.getValue("idToTab", key) ?? null;
+    }
+    if (typeof key === "string") {
+      let candidate: Tab | Tab[] | null = null;
+      if (!isNaN(+key) && +key > 0) {
+        candidate = __maps__.getValue("idToTab", +key) ?? null;
+      }
+      if (!candidate) {
+        candidate = this._getTabsByUrl(key);
+      }
+      return candidate;
+    }
+    return null;
+  }
+
+  private _getTabsByUrl(url: string): Tab[] {
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return [];
+    }
+    const ids = __maps__.getValue<string, number[]>("urlToIds", url);
+    if (ids && ids.length) {
+      const result: Tab[] = [];
+      for (const id of ids) {
+        result.push(__maps__.getValue("idToTab", id)!);
+      }
+      return result;
+    }
+    return [];
   }
 
   public has(key: string | number): boolean {
-    return _tabs.has(key);
+    return this._has(key);
+  }
+
+  private _hasUrl(url: string) {
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return false;
+    }
+    return __maps__.hasKey("urlToIds", url);
+  }
+
+  public _has(key: string | number): boolean {
+    if (typeof key === "number") {
+      return __maps__.hasKey("idToTab", key);
+    }
+    if (typeof key === "string") {
+      let a: boolean = false;
+      if (!isNaN(+key) && +key > 0) {
+        a = __maps__.hasKey("idToTab", +key);
+      }
+      const b = this._hasUrl(key);
+      return a || b;
+    }
+    return false;
   }
 
   public focus(tab: Tab): void {
