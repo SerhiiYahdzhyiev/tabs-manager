@@ -9,22 +9,8 @@ declare let __tabs__: Tab[];
 declare let _activeId: number;
 
 export class Tabs {
-  private __debug__ = false;
+  private __debug__ = true;
   private _activeId = 0;
-
-  public _assertTabId(tab: Tab): boolean {
-    if (!tab.id) {
-      return false;
-    }
-    return true;
-  }
-
-  public _assertTabUrl(tab: Tab): boolean {
-    if (!tab.url && !tab.pendingUrl) {
-      return false;
-    }
-    return true;
-  }
 
   private log(...args: unknown[]) {
     if (this.__debug__) console.log(...args);
@@ -67,7 +53,7 @@ export class Tabs {
 
     Object.assign(tab, changeInfo);
 
-    if (urlChanged && this._assertTabUrl(tab)) {
+    if (urlChanged && (tab.url || tab.pendingUrl)) {
       const url: string = (tab.url || tab.pendingUrl)!;
       __maps__.updateMap("urlToIds", url, tab.id);
     }
