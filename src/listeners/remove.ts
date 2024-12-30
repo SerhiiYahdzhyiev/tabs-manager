@@ -4,18 +4,18 @@ import { ListenerFunction, TListenerFunction } from "./base";
 
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
-declare let _idxUpdateLock: number;
+declare let _idxUpdateLock: number; // eslint-disable-line
 
 async function removeListener(this: TListenerFunction, id: number) {
   this.debug("Removed!");
   _idxUpdateLock++;
   const oldTab = __maps__.getValue<number, Tab>("idToTab", id)!;
 
-  const host = oldTab?.urlObj?.host;
+  const host = oldTab?.host;
   if (host && __maps__.hasKey("hostToIds", host)) {
     __maps__.updateMap("hostToIds", host, id);
   } else {
-    console.warn("Failed to get host removed tab!");
+    console.warn("Failed to get host of removed tab!");
   }
 
   __tabs__ = __tabs__.filter((t) => t.id !== id);

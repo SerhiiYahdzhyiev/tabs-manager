@@ -5,7 +5,7 @@ import { ListenerFunction, TListenerFunction } from "./base";
 
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
-declare let _idxUpdateLock: number;
+declare let _idxUpdateLock: number; // eslint-disable-line
 
 async function createListener(this: TListenerFunction, tab: chrome.tabs.Tab) {
   this.debug("Created!");

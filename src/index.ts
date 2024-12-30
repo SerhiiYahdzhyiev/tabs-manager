@@ -1,7 +1,7 @@
 "use strict";
 
 declare let __tabs__: Tab[];
-declare let _activeId: number;
+declare let _activeId: number; // eslint-disable-line
 declare let __maps__: ITabMaps;
 
 Object.assign(globalThis, { __debug__: true });
