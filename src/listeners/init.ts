@@ -6,7 +6,7 @@ import create from "./create";
 import remove from "./remove";
 import update from "./update";
 
-import checkHostsMap from "./check-hosts-map";
+import checkHostsMap from "./clean-hosts-map";
 import updateIndexes from "./update-indexes";
 
 export function initListeners() {

@@ -3,7 +3,7 @@ import { ListenerFunction, TListenerFunction } from "./base";
 
 declare const __maps__: ITabMaps;
 
-export function checkHostsMap(this: TListenerFunction) {
+export function cleanHostsMap(this: TListenerFunction) {
   for (const [k, ids] of __maps__.entries<string, number[]>("hostToIds")) {
     if (!ids.length) {
       this.debug("Deleting ", k);
@@ -12,8 +12,8 @@ export function checkHostsMap(this: TListenerFunction) {
   }
 }
 
-Object.setPrototypeOf(checkHostsMap, ListenerFunction);
+Object.setPrototypeOf(cleanHostsMap, ListenerFunction);
 
-export default checkHostsMap.bind(
-  checkHostsMap as unknown as TListenerFunction,
+export default cleanHostsMap.bind(
+  cleanHostsMap as unknown as TListenerFunction,
 );
