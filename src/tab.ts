@@ -79,8 +79,8 @@ export class Tab {
 
   private async _discard(): Promise<Tab> {
     const rawTab = await Browser.getTabs().discard(this.id);
-    discard(this.id, rawTab.id!);
-    Object.assign(this, rawTab);
+    discard(this.id, rawTab?.id || this.id);
+    Object.assign(this, rawTab || { discarded: true });
     return this;
   }
 

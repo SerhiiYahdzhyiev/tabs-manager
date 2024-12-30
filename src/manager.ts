@@ -46,8 +46,8 @@ export class TabsManager implements IVersionable {
       discard: async (tabId: number) => {
         const tab = await browserTabs.discard(tabId);
         const oldTab = __maps__.getValue("idToTab", tabId)!;
-        discard(tabId, tab.id!);
-        Object.assign(oldTab, tab);
+        discard(tabId, tab?.id || tabId);
+        Object.assign(oldTab, tab || { discarded: true });
         return oldTab;
       },
       query: async (info: chrome.tabs.QueryInfo) => {
