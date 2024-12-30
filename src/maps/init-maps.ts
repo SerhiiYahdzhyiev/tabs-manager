@@ -3,6 +3,7 @@ import { TabMaps } from "./tab-maps";
 import { TabsMapOneToMany } from "../types";
 
 import { simpleOneToOneMapUpdater, stringToIdsMapUpdater } from "./updaters";
+import { MapName } from "./map-names";
 
 export function initMaps() {
   const _urlToIds = new Map<string, number[]>();
@@ -13,28 +14,29 @@ export function initMaps() {
 
   const maps = new TabMaps();
 
-  maps.registerMap<number, Tab>("idToTab", _idToTab);
-  maps.registerMap<number, Tab>("idxToTab", _idxToTab);
-  maps.registerMap<string, number[]>("urlToIds", _urlToIds);
-  maps.registerMap<string, Iterable<number>>("hostToIds", _hostToIds);
+  maps.registerMap<number, Tab>(MapName.ID_2_TAB, _idToTab);
+  maps.registerMap<number, Tab>(MapName.IDX_2_TAB, _idxToTab);
+
+  maps.registerMap<string, number[]>(MapName.URL_2_IDS, _urlToIds);
+  maps.registerMap<string, number[]>(MapName.HOST_2_IDS, _hostToIds);
 
   maps.registerUpdater<Map<number, Tab>, number, Tab>(
-    "idToTab",
+    MapName.ID_2_TAB,
     simpleOneToOneMapUpdater,
   );
 
   maps.registerUpdater<Map<number, Tab>, number, Tab>(
-    "idxToTab",
+    MapName.IDX_2_TAB,
     simpleOneToOneMapUpdater,
   );
 
   maps.registerUpdater<Map<string, number[]>, string, number>(
-    "urlToIds",
+    MapName.URL_2_IDS,
     stringToIdsMapUpdater,
   );
 
   maps.registerUpdater<TabsMapOneToMany<string, number>, string, number>(
-    "hostToIds",
+    MapName.HOST_2_IDS,
     stringToIdsMapUpdater,
   );
 
