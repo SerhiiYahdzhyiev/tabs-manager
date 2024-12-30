@@ -8,13 +8,10 @@ Object.assign(globalThis, { _activeId: 0 });
 import { Environment } from "./env";
 import { Browser } from "./api";
 
-import { Tabs } from "./tabs";
-import { Tab } from "./tab";
 import { TabsManager } from "./manager";
 
 import { initMaps } from "./maps/init-maps";
 import { initListeners } from "./listeners/init";
-import { ITabMaps } from "./interfaces";
 import { initTabs } from "./tabs/init";
 
 const requiredPermissions = ["tabs", "activeTab"];
@@ -41,7 +38,6 @@ const requiredPermissions = ["tabs", "activeTab"];
   // INFO: Globals assignment...
   Object.assign(globalThis, { __tabs__: [] });
   Object.assign(globalThis, { envType: Environment.getEnvType() });
-  Object.assign(globalThis, { _tabs: new Tabs() });
 
   initMaps();
   initListeners();

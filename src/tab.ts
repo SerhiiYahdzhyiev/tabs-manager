@@ -1,11 +1,9 @@
 import { Browser } from "./api";
-import { Tabs } from "./tabs";
+import { discard } from "./discard";
 
 import { isFirefox, withError } from "./utils/process";
 
 import clearAllInputs from "./scripts/clearAllInputs";
-
-declare let _tabs: Tabs;
 
 export class Tab {
   active: boolean = false;
@@ -84,7 +82,7 @@ export class Tab {
 
   private async _discard(): Promise<Tab> {
     const rawTab = await Browser.getTabs().discard(this.id);
-    _tabs.discard(this.id, rawTab.id!);
+    discard(this.id, rawTab.id!);
     Object.assign(this, rawTab);
     return this;
   }

@@ -1,13 +1,12 @@
 import { ITabMaps, IVersionable } from "./interfaces";
 import { Browser } from "./api";
+import { discard } from "./discard";
 
-import { Tabs } from "./tabs";
 import { Tab } from "./tab";
 
 import { sleep } from "./utils/process";
 
 declare const __maps__: ITabMaps;
-declare let _tabs: Tabs;
 declare let __tabs__: Tab[];
 declare let _activeId: number;
 
@@ -47,7 +46,7 @@ export class TabsManager implements IVersionable {
       discard: async (tabId: number) => {
         const tab = await browserTabs.discard(tabId);
         const oldTab = __maps__.getValue("idToTab", tabId)!;
-        _tabs.discard(tabId, tab.id!);
+        discard(tabId, tab.id!);
         Object.assign(oldTab, tab);
         return oldTab;
       },
