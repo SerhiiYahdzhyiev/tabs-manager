@@ -1,7 +1,7 @@
 import { Browser } from "./api";
 import { discard } from "./discard";
 
-import { isFirefox, withError } from "./utils/process";
+import { isFirefox } from "./utils/process";
 
 import clearAllInputs from "./scripts/clearAllInputs";
 
@@ -51,6 +51,7 @@ export class Tab {
 
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
+    // TODO: Refactor/improve this...
     Object.assign(this, {
       [Symbol.toStringTag]: `Tab.${this.urlObj?.host || "broken"}`,
     });
@@ -58,26 +59,22 @@ export class Tab {
     this.createdAt = Date.now();
 
     this.connect = this._withRemoved(this._connect.bind(this));
-    this.clearAllInputs = this._withRemoved(
-      withError(this._clearAllInputs.bind(this)),
-    );
-    this.discard = this._withRemoved(withError(this._discard.bind(this)));
-    this.duplicate = this._withRemoved(withError(this._duplicate.bind(this)));
-    this.goBack = this._withRemoved(withError(this._goBack.bind(this)));
-    this.goForward = this._withRemoved(withError(this._goForward.bind(this)));
-    this.getLanguage = this._withRemoved(withError(this._language.bind(this)));
-    this.getScreenshot = this._withRemoved(
-      withError(this._screenshot.bind(this)),
-    );
-    this.move = this._withRemoved(withError(this._move.bind(this)));
-    this.reload = this._withRemoved(withError(this._reload.bind(this)));
+    this.clearAllInputs = this._withRemoved(this._clearAllInputs.bind(this));
+    this.discard = this._withRemoved(this._discard.bind(this));
+    this.duplicate = this._withRemoved(this._duplicate.bind(this));
+    this.goBack = this._withRemoved(this._goBack.bind(this));
+    this.goForward = this._withRemoved(this._goForward.bind(this));
+    this.getLanguage = this._withRemoved(this._language.bind(this));
+    this.getScreenshot = this._withRemoved(this._screenshot.bind(this));
+    this.move = this._withRemoved(this._move.bind(this));
+    this.reload = this._withRemoved(this._reload.bind(this));
     this.remove = this.close = this._withRemoved(
-      this._withRemoved(withError(this._remove.bind(this))),
+      this._withRemoved(this._remove.bind(this)),
     );
-    this.update = this._withRemoved(withError(this._update.bind(this)));
+    this.update = this._withRemoved(this._update.bind(this));
 
-    this.focus = this._withRemoved(withError(this.focus.bind(this)));
-    this.forceClose = this._withRemoved(withError(this.forceClose.bind(this)));
+    this.focus = this._withRemoved(this.focus.bind(this));
+    this.forceClose = this._withRemoved(this.forceClose.bind(this));
   }
 
   private async _discard(): Promise<Tab> {
