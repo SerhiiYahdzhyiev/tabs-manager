@@ -6,7 +6,7 @@ import create from "./create";
 import remove from "./remove";
 import update from "./update";
 
-import checkHostsMap from "./clean-hosts-map";
+import cleanHostsMap from "./clean-hosts-map";
 import updateIndexes from "./update-indexes";
 
 export function initListeners() {
@@ -15,15 +15,15 @@ export function initListeners() {
 
   tabs.onActivated.addListener(activate);
 
-  tabs.onUpdated.addListener(checkHostsMap);
   tabs.onUpdated.addListener(update);
+  tabs.onUpdated.addListener(cleanHostsMap);
 
   tabs.onCreated.addListener(create);
   tabs.onCreated.addListener(updateIndexes);
 
-  tabs.onRemoved.addListener(checkHostsMap);
   tabs.onRemoved.addListener(remove);
   tabs.onRemoved.addListener(updateIndexes);
+  tabs.onRemoved.addListener(cleanHostsMap);
 
   tabs.onMoved.addListener(updateIndexes);
 }
