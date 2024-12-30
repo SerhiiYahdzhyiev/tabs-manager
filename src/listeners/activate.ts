@@ -9,7 +9,7 @@ declare let _activeId: number;
 declare let __tabs__: Tab[];
 declare let _idxUpdateLock: number;
 
-async function activatedListener(
+async function activateListener(
   this: TListenerFunction,
   info: chrome.tabs.TabActiveInfo,
 ) {
@@ -48,8 +48,8 @@ async function activatedListener(
   }
 }
 
-Object.setPrototypeOf(activatedListener, ListenerFunction);
+Object.setPrototypeOf(activateListener, ListenerFunction);
 
-export default activatedListener.bind(
-  activatedListener as unknown as TListenerFunction,
+export default activateListener.bind(
+  activateListener as unknown as TListenerFunction,
 );
