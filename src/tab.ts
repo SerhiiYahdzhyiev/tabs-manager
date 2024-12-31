@@ -1,9 +1,11 @@
 import { Browser } from "./api";
-import { discard } from "./manipulations/discard";
+import { manipulations } from "./manipulations/index";
+import { debug } from "./utils/logging";
 
 import { isFirefox } from "./utils/process";
 
 import clearAllInputs from "./scripts/clearAllInputs";
+import { ManipulationName } from "./manipulations/names";
 
 export class Tab {
   active: boolean = false;
@@ -49,6 +51,26 @@ export class Tab {
     };
   }
 
+  private debug(...args: unknown[]) {
+    const _args = [`[${String(this)}]: `, ...args];
+    debug(..._args);
+  }
+
+  private async executeManipulation(
+    name: ManipulationName,
+    payload: unknown = null,
+  ) {
+    const manipulation = manipulations.get(name);
+    if (!manipulation) {
+      this.debug("No tab manipulation with name: " + name);
+      return;
+    }
+    const args = manipulation.getArgsFrom(this, payload);
+    return args instanceof Array
+      ? await manipulation(...args)
+      : await manipulation(args);
+  }
+
   constructor(tab: chrome.tabs.Tab) {
     Object.assign(this, tab);
     // TODO: Refactor/improve this...
@@ -78,8 +100,7 @@ export class Tab {
   }
 
   private async _discard(): Promise<Tab> {
-    const rawTab = await Browser.getTabs().discard(this.id);
-    discard(this.id, rawTab?.id || this.id);
+    const rawTab = await this.executeManipulation(ManipulationName.DISCARD);
     Object.assign(this, rawTab || { discarded: true });
     return this;
   }

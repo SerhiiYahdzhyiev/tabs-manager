@@ -1,10 +1,15 @@
 import { ITabMaps, IVersionable } from "./interfaces";
 import { Browser } from "./api";
-import { discard } from "./manipulations/discard";
+import { manipulations } from "./manipulations/index";
 
 import { Tab } from "./tab";
 
 import { sleep } from "./utils/process";
+import { debug } from "./utils/logging";
+import { ManipulationName } from "./manipulations/names";
+
+type TabManipulationTarget = number | Tab;
+type TabManipulationPayload = unknown;
 
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
@@ -17,6 +22,27 @@ export class TabsManager implements IVersionable {
 
   public static get version(): string {
     return this.__version__;
+  }
+
+  private debug(...args: unknown[]) {
+    const _args = [`[${String(this)}]: `, ...args];
+    debug(..._args);
+  }
+
+  private async executeManipulation(
+    name: string,
+    target: TabManipulationTarget,
+    payload: TabManipulationPayload = null,
+  ) {
+    const manipulation = manipulations.get(name);
+    if (!manipulation) {
+      this.debug("No tab manipulation with name: " + name);
+      return;
+    }
+    const args = manipulation.getArgsFrom(target, payload);
+    return args instanceof Array
+      ? await manipulation(...args)
+      : await manipulation(args);
   }
 
   get version(): string {
@@ -43,12 +69,8 @@ export class TabsManager implements IVersionable {
       },
       connect: browserTabs.connect,
       // TODO: Refactor?..
-      discard: async (tabId: number) => {
-        const tab = await browserTabs.discard(tabId);
-        const oldTab = __maps__.getValue("idToTab", tabId)!;
-        discard(tabId, tab?.id || tabId);
-        Object.assign(oldTab, tab || { discarded: true });
-        return oldTab;
+      discard: async (target: TabManipulationTarget) => {
+        return await this.executeManipulation(ManipulationName.DISCARD, target);
       },
       query: async (info: chrome.tabs.QueryInfo) => {
         const candidates = await browserTabs.query(info);
