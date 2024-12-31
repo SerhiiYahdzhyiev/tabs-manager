@@ -1,5 +1,5 @@
 import { Browser } from "./api";
-import { discard } from "./discard";
+import { discard } from "./manipulations/discard";
 
 import { isFirefox } from "./utils/process";
 

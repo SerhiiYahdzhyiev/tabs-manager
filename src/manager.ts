@@ -1,6 +1,6 @@
 import { ITabMaps, IVersionable } from "./interfaces";
 import { Browser } from "./api";
-import { discard } from "./discard";
+import { discard } from "./manipulations/discard";
 
 import { Tab } from "./tab";
 

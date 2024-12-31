@@ -1,6 +1,6 @@
-import { Tab } from "./tab";
-import { ITabMaps } from "./interfaces";
-import { MapName } from "./maps/map-names";
+import { Tab } from "../tab";
+import { ITabMaps } from "../interfaces";
+import { MapName } from "../maps/map-names";
 
 declare const __maps__: ITabMaps;
 
