@@ -80,6 +80,7 @@ export class TabsManager implements IVersionable {
         return candidates;
       },
       remove: browserTabs.remove,
+      close: browserTabs.remove,
       reload: browserTabs.reload,
       update: async (tabId: number, props: chrome.tabs.UpdateProperties) => {
         const updated = await browserTabs.update(tabId, props);
