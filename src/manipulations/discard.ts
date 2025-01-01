@@ -18,6 +18,7 @@ function _discard(oldId: number, newId: number) {
 
 async function discard(tabId: number) {
   const tab = await Browser.getTabs().discard(tabId);
+
   const oldTab = __maps__.getValue(MapName.ID_2_TAB, tabId)!;
   _discard(tabId, tab?.id || tabId);
   Object.assign(oldTab, tab || { discarded: true });
@@ -26,10 +27,10 @@ async function discard(tabId: number) {
 
 Object.setPrototypeOf(discard, TabManipulation);
 
-discard._getArgsFrom = function (target: number | TTab): number {
+discard._getArgsFrom = function (target: number | string | TTab): number {
   return typeof (target as TTab).id !== "undefined"
     ? (target as TTab).id!
-    : (target as number);
+    : +(target as number);
 };
 
 export default discard as unknown as TTabManipulation;
