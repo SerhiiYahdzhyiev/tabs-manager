@@ -17,6 +17,7 @@ export type TabsMapUpdater<MapType, K, V> = (
   value: V | null,
 ) => void;
 
+// TODO: Finalize the type...
 export type TTab = chrome.tabs.Tab & {
   host: string;
 };

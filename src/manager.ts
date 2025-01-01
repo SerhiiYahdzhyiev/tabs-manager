@@ -68,9 +68,34 @@ export class TabsManager implements IVersionable {
         return __tabs__[__tabs__.length - 1];
       },
       connect: browserTabs.connect,
-      // TODO: Refactor?..
-      discard: async (target: TabManipulationTarget) => {
-        return await this.executeManipulation(ManipulationName.DISCARD, target);
+      discard: async (...target: TabManipulationTarget[]) => {
+        const name = ManipulationName.DISCARD;
+        if (target.length === 1) {
+          if (typeof target[0] === "string" && !+target[0]) {
+            throw new Error(
+              "Invalid taret for TabsManager.discard: " + target[0],
+            );
+          }
+          return await this.executeManipulation(name, target[0]);
+        }
+        const results = [];
+        for (const item of target) {
+          if (typeof target[0] === "string" && !+target[0]) {
+            console.warn(
+              "Invalid taret for TabsManager.discard: " +
+                target[0] +
+                " ! Skipping...",
+            );
+            continue;
+          }
+          try {
+            const ret = await this.executeManipulation(name, item);
+            results.push(ret);
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+        return results;
       },
       query: async (info: chrome.tabs.QueryInfo) => {
         const candidates = await browserTabs.query(info);
