@@ -8,7 +8,7 @@ Object.assign(globalThis, { _activeId: 0 });
 import { Environment } from "./env";
 import { Browser } from "./api";
 
-import { TabsManager } from "./manager";
+import { TabsManager } from "./manager/index";
 
 import { initMaps } from "./maps/init-maps";
 import { initListeners } from "./listeners/init";

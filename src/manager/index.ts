@@ -1,12 +1,12 @@
-import { ITabMaps, IVersionable } from "./interfaces";
-import { Browser } from "./api";
-import { manipulations } from "./manipulations/index";
+import { ITabMaps, IVersionable } from "../interfaces";
+import { Browser } from "../api";
+import { manipulations } from "../manipulations/index";
 
-import { Tab } from "./tab";
+import { Tab } from "../tab";
 
-import { sleep } from "./utils/process";
-import { debug } from "./utils/logging";
-import { ManipulationName } from "./manipulations/names";
+import { sleep } from "../utils/process";
+import { debug } from "../utils/logging";
+import { discard } from "./discard";
 
 type TabManipulationTarget = number | Tab;
 type TabManipulationPayload = unknown;
@@ -29,7 +29,7 @@ export class TabsManager implements IVersionable {
     debug(..._args);
   }
 
-  private async executeManipulation(
+  public async executeManipulation(
     name: string,
     target: TabManipulationTarget,
     payload: TabManipulationPayload = null,
@@ -68,35 +68,7 @@ export class TabsManager implements IVersionable {
         return __tabs__[__tabs__.length - 1];
       },
       connect: browserTabs.connect,
-      discard: async (...target: TabManipulationTarget[]) => {
-        const name = ManipulationName.DISCARD;
-        if (target.length === 1) {
-          if (typeof target[0] === "string" && !+target[0]) {
-            throw new Error(
-              "Invalid taret for TabsManager.discard: " + target[0],
-            );
-          }
-          return await this.executeManipulation(name, target[0]);
-        }
-        const results = [];
-        for (const item of target) {
-          if (typeof target[0] === "string" && !+target[0]) {
-            console.warn(
-              "Invalid taret for TabsManager.discard: " +
-                target[0] +
-                " ! Skipping...",
-            );
-            continue;
-          }
-          try {
-            const ret = await this.executeManipulation(name, item);
-            results.push(ret);
-          } catch (e) {
-            console.warn(e);
-          }
-        }
-        return results;
-      },
+      discard: discard.bind(this),
       query: async (info: chrome.tabs.QueryInfo) => {
         const candidates = await browserTabs.query(info);
         if (candidates?.length) {
