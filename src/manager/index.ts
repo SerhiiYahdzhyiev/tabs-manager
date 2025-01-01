@@ -1,11 +1,11 @@
-import { ITabMaps, IVersionable } from "../interfaces";
 import { Browser } from "../api";
+import { ITabMaps, IVersionable } from "../interfaces";
 import { manipulations } from "../manipulations/index";
-
+import { MapName } from "../maps/map-names";
 import { Tab } from "../tab";
-
 import { sleep } from "../utils/process";
 import { debug } from "../utils/logging";
+
 import { discard } from "./discard";
 import { create } from "./create";
 
@@ -100,7 +100,9 @@ export class TabsManager implements IVersionable {
 
   public get active(): Tab | null {
     if (_activeId) {
-      return __maps__.getValue<number, Tab>("idToTab", _activeId) ?? null;
+      return (
+        __maps__.getValue<number, Tab>(MapName.ID_2_TAB, _activeId) ?? null
+      );
     }
     return null;
   }
@@ -115,12 +117,12 @@ export class TabsManager implements IVersionable {
 
   public _get(key: string | number): Tab | Tab[] | null {
     if (typeof key === "number") {
-      return __maps__.getValue("idToTab", key) ?? null;
+      return __maps__.getValue(MapName.ID_2_TAB, key) ?? null;
     }
     if (typeof key === "string") {
       let candidate: Tab | Tab[] | null = null;
       if (!isNaN(+key) && +key > 0) {
-        candidate = __maps__.getValue("idToTab", +key) ?? null;
+        candidate = __maps__.getValue(MapName.ID_2_TAB, +key) ?? null;
       }
       if (!candidate) {
         candidate = this._getTabsByUrl(key);
@@ -137,11 +139,11 @@ export class TabsManager implements IVersionable {
       console.warn("Invalid url: " + url);
       return [];
     }
-    const ids = __maps__.getValue<string, number[]>("urlToIds", url);
+    const ids = __maps__.getValue<string, number[]>(MapName.URL_2_IDS, url);
     if (ids && ids.length) {
       const result: Tab[] = [];
       for (const id of ids) {
-        result.push(__maps__.getValue("idToTab", id)!);
+        result.push(__maps__.getValue(MapName.ID_2_TAB, id)!);
       }
       return result;
     }
@@ -159,17 +161,17 @@ export class TabsManager implements IVersionable {
       console.warn("Invalid url: " + url);
       return false;
     }
-    return __maps__.hasKey("urlToIds", url);
+    return __maps__.hasKey(MapName.URL_2_IDS, url);
   }
 
   public _has(key: string | number): boolean {
     if (typeof key === "number") {
-      return __maps__.hasKey("idToTab", key);
+      return __maps__.hasKey(MapName.ID_2_TAB, key);
     }
     if (typeof key === "string") {
       let a: boolean = false;
       if (!isNaN(+key) && +key > 0) {
-        a = __maps__.hasKey("idToTab", +key);
+        a = __maps__.hasKey(MapName.ID_2_TAB, +key);
       }
       const b = this._hasUrl(key);
       return a || b;
@@ -185,7 +187,7 @@ export class TabsManager implements IVersionable {
   public get tabs(): Tab[] {
     // INFO: Temporary realization, will be changed to respect filters...
     const _tabs = [];
-    for (const [i, t] of __maps__.entries<number, Tab>("idxToTab")) {
+    for (const [i, t] of __maps__.entries<number, Tab>(MapName.IDX_2_TAB)) {
       _tabs[i] = t;
     }
     return _tabs;
@@ -195,13 +197,16 @@ export class TabsManager implements IVersionable {
     // WARN: This is temporary solution
     // TODO: Replace with first element of fileterd tabs list of current
     //       manager.
-    return __maps__.getValue<number, Tab>("idxToTab", __tabs__.length - 1)!;
+    return __maps__.getValue<number, Tab>(
+      MapName.IDX_2_TAB,
+      __tabs__.length - 1,
+    )!;
   }
 
   public get first(): Tab {
     // WARN: This is temporary solution
     // TODO: Replace with first element of fileterd tabs list of current
     //       manager.
-    return __maps__.getValue<number, Tab>("idxToTab", 0)!;
+    return __maps__.getValue<number, Tab>(MapName.IDX_2_TAB, 0)!;
   }
 }
