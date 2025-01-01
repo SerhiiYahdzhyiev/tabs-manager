@@ -7,6 +7,7 @@ import { Tab } from "../tab";
 import { sleep } from "../utils/process";
 import { debug } from "../utils/logging";
 import { discard } from "./discard";
+import { create } from "./create";
 
 type TabManipulationTarget = number | Tab;
 type TabManipulationPayload = unknown;
@@ -62,11 +63,7 @@ export class TabsManager implements IVersionable {
     const browserTabs = Browser.getTabs();
 
     Object.assign(this, {
-      create: async (props: chrome.tabs.CreateProperties = {}) => {
-        await browserTabs.create(props);
-        await sleep(200);
-        return __tabs__[__tabs__.length - 1];
-      },
+      create: create.bind(this),
       connect: browserTabs.connect,
       discard: discard.bind(this),
       query: async (info: chrome.tabs.QueryInfo) => {
