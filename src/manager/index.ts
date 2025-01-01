@@ -9,9 +9,6 @@ import { debug } from "../utils/logging";
 import { discard } from "./discard";
 import { create } from "./create";
 
-type TabManipulationTarget = number | Tab;
-type TabManipulationPayload = unknown;
-
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
 declare let _activeId: number;
@@ -32,8 +29,8 @@ export class TabsManager implements IVersionable {
 
   public async executeManipulation(
     name: string,
-    target: TabManipulationTarget,
-    payload: TabManipulationPayload = null,
+    target: unknown,
+    payload: unknown = null,
   ) {
     const manipulation = manipulations.get(name);
     if (!manipulation) {
