@@ -22,7 +22,6 @@ export class Tab {
   connect: CallableFunction;
   clearAllInputs: CallableFunction;
   close: CallableFunction;
-  discard: CallableFunction;
   duplicate: CallableFunction;
   getLanguage: CallableFunction;
   getScreenshot: CallableFunction;
@@ -60,6 +59,10 @@ export class Tab {
     name: ManipulationName,
     payload: unknown = null,
   ) {
+    if (this._removed) {
+      console.warn("Cannot use operation on closed tab!");
+      return;
+    }
     const manipulation = manipulations.get(name);
     if (!manipulation) {
       this.debug("No tab manipulation with name: " + name);
@@ -82,7 +85,6 @@ export class Tab {
 
     this.connect = this._withRemoved(this._connect.bind(this));
     this.clearAllInputs = this._withRemoved(this._clearAllInputs.bind(this));
-    this.discard = this._withRemoved(this._discard.bind(this));
     this.duplicate = this._withRemoved(this._duplicate.bind(this));
     this.goBack = this._withRemoved(this._goBack.bind(this));
     this.goForward = this._withRemoved(this._goForward.bind(this));
@@ -99,7 +101,7 @@ export class Tab {
     this.forceClose = this._withRemoved(this.forceClose.bind(this));
   }
 
-  private async _discard(): Promise<Tab> {
+  public async discard(): Promise<Tab> {
     const rawTab = await this.executeManipulation(ManipulationName.DISCARD);
     Object.assign(this, rawTab || { discarded: true });
     return this;
