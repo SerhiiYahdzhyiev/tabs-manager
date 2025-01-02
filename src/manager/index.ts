@@ -1,12 +1,14 @@
 import { Browser } from "../api";
 import { ITabMaps, IVersionable } from "../interfaces";
 import { manipulations } from "../manipulations/index";
+import { ManipulationName } from "../manipulations/names";
 import { MapName } from "../maps/map-names";
 import { Tab } from "../tab";
 import { sleep } from "../utils/process";
 import { debug } from "../utils/logging";
 
 import { discard } from "./discard";
+import { connect } from "./connect";
 import { create } from "./create";
 
 declare const __maps__: ITabMaps;
@@ -28,7 +30,7 @@ export class TabsManager implements IVersionable {
   }
 
   public async executeManipulation(
-    name: string,
+    name: ManipulationName,
     target: unknown,
     payload: unknown = null,
   ) {
@@ -41,6 +43,20 @@ export class TabsManager implements IVersionable {
     return args instanceof Array
       ? await manipulation(...args)
       : await manipulation(args);
+  }
+
+  public executeManipulationSync(
+    name: ManipulationName,
+    target: unknown,
+    payload: unknown = null,
+  ) {
+    const manipulation = manipulations.get(name);
+    if (!manipulation) {
+      this.debug("No tab manipulation with name: " + name);
+      return;
+    }
+    const args = manipulation.getArgsFrom(target, payload);
+    return args instanceof Array ? manipulation(...args) : manipulation(args);
   }
 
   get version(): string {
@@ -61,7 +77,7 @@ export class TabsManager implements IVersionable {
 
     Object.assign(this, {
       create: create.bind(this),
-      connect: browserTabs.connect,
+      connect: connect.bind(this),
       discard: discard.bind(this),
       query: async (info: chrome.tabs.QueryInfo) => {
         const candidates = await browserTabs.query(info);
