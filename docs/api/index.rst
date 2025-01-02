@@ -7,4 +7,3 @@ API Documentation
 
    Browser <browser>
    Environment <env>
-   Utils <utils>
