@@ -4,11 +4,9 @@ import { ListenerFunction, TListenerFunction } from "./base";
 
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
-declare let _idxUpdateLock: number; // eslint-disable-line
 
 async function removeListener(this: TListenerFunction, id: number) {
   this.debug("Removed!");
-  _idxUpdateLock++;
   const oldTab = __maps__.getValue<number, Tab>("idToTab", id)!;
 
   const host = oldTab?.host;
@@ -25,7 +23,6 @@ async function removeListener(this: TListenerFunction, id: number) {
     __maps__.updateMap("urlToIds", url, id);
   }
   __maps__.updateMap("idToTab", id, null);
-  _idxUpdateLock--;
 }
 
 Object.setPrototypeOf(removeListener, ListenerFunction);

@@ -21,7 +21,6 @@ export class Tab {
   //TODO: Improve typehints...
   connect: CallableFunction;
   clearAllInputs: CallableFunction;
-  close: CallableFunction;
   duplicate: CallableFunction;
   getLanguage: CallableFunction;
   getScreenshot: CallableFunction;
@@ -29,7 +28,6 @@ export class Tab {
   goForward: CallableFunction;
   move: CallableFunction;
   reload: CallableFunction;
-  remove: CallableFunction;
   update: CallableFunction;
 
   private _removed = false;
@@ -92,13 +90,18 @@ export class Tab {
     this.getScreenshot = this._withRemoved(this._screenshot.bind(this));
     this.move = this._withRemoved(this._move.bind(this));
     this.reload = this._withRemoved(this._reload.bind(this));
-    this.remove = this.close = this._withRemoved(
-      this._withRemoved(this._remove.bind(this)),
-    );
     this.update = this._withRemoved(this._update.bind(this));
 
     this.focus = this._withRemoved(this.focus.bind(this));
     this.forceClose = this._withRemoved(this.forceClose.bind(this));
+  }
+
+  public async remove(): Promise<Tab> {
+    return await this.executeManipulation(ManipulationName.REMOVE);
+  }
+
+  public async close(): Promise<Tab> {
+    return await this.executeManipulation(ManipulationName.REMOVE);
   }
 
   public async discard(): Promise<Tab> {

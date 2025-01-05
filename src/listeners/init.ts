@@ -22,7 +22,6 @@ export function initListeners() {
   tabs.onCreated.addListener(updateIndexes);
 
   tabs.onRemoved.addListener(remove);
-  tabs.onRemoved.addListener(updateIndexes);
   tabs.onRemoved.addListener(cleanHostsMap);
 
   tabs.onMoved.addListener(updateIndexes);

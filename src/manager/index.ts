@@ -8,6 +8,7 @@ import { sleep } from "../utils/process";
 import { debug } from "../utils/logging";
 
 import { discard } from "./discard";
+import { remove } from "./remove";
 import { connect } from "./connect";
 import { create } from "./create";
 
@@ -89,8 +90,8 @@ export class TabsManager implements IVersionable {
         }
         return candidates;
       },
-      remove: browserTabs.remove,
-      close: browserTabs.remove,
+      remove: remove.bind(this),
+      close: remove.bind(this),
       reload: browserTabs.reload,
       update: async (tabId: number, props: chrome.tabs.UpdateProperties) => {
         const updated = await browserTabs.update(tabId, props);
