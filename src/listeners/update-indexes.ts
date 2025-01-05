@@ -13,8 +13,10 @@ async function updateIndexes(this: TListenerFunction) {
   this.debug("Updating indecies...");
   while (_idxUpdateLock > 0) {
     this.debug("Waiting for index update lock release...");
+    this.debug("_idxUpdateLock: ", _idxUpdateLock);
     await sleep(100);
   }
+  this.debug("Increasing lock...");
   _idxUpdateLock++;
   // INFO: Probably rebuilding the entire map is not the efficient way,
   //       but I've struggled to write it differently without introducing
@@ -29,6 +31,7 @@ async function updateIndexes(this: TListenerFunction) {
     tab.index = realIdx;
     __maps__.updateMap("idxToTab", realIdx, tab);
   }
+  this.debug("Decreasing lock...");
   _idxUpdateLock--;
 }
 
