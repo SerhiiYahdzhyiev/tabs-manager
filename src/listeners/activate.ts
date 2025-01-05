@@ -17,12 +17,16 @@ async function activateListener(
 
   while (_idxUpdateLock > 0) {
     this.debug("Waiting for indexes update lock release...");
+    this.debug("_idxUpdateLock: ", _idxUpdateLock);
     await sleep(100);
   }
 
   this.debug("Current activateId: " + _activeId);
   this.debug("Tab Active info: ");
   this.debug(info);
+
+  this.debug("Increasing lock...");
+  _idxUpdateLock++;
   if (_activeId && _activeId !== info.tabId) {
     const tab = __maps__.getValue<number, Tab>("idToTab", _activeId);
     if (tab) {
@@ -46,6 +50,8 @@ async function activateListener(
       __tabs__[tab.index].active = tab.active = true;
     }
   }
+  this.debug("Decreasing lock...");
+  _idxUpdateLock--;
 }
 
 Object.setPrototypeOf(activateListener, ListenerFunction);
