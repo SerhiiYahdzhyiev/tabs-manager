@@ -1,4 +1,3 @@
-import updateIndexes from "../listeners/update-indexes";
 import { ManipulationName } from "../manipulations/names";
 import { TTab } from "../types";
 
@@ -7,13 +6,11 @@ type TThis = { executeManipulation: CallableFunction };
 
 export async function remove(this: TThis, ...target: Target[]) {
   const name = ManipulationName.REMOVE;
-  const updIdx = updateIndexes.bind(this);
 
   if (target.length === 1) {
     if (typeof target[0] === "string" && !+target[0]) {
       throw new Error("Invalid taret for TabsManager.remove: " + target[0]);
     }
-    await updIdx();
     return await this.executeManipulation(name, target[0]);
   }
 
@@ -32,6 +29,5 @@ export async function remove(this: TThis, ...target: Target[]) {
       console.warn(e);
     }
   }
-  await updIdx();
   return results;
 }

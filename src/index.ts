@@ -2,7 +2,6 @@
 
 // INFO: Globals assignment...
 Object.assign(globalThis, { __debug__: true });
-Object.assign(globalThis, { _idxUpdateLock: 0 });
 Object.assign(globalThis, { _activeId: 0 });
 
 import { Environment } from "./env";

@@ -3,21 +3,11 @@ import { Tab } from "../tab";
 import { Browser } from "../api";
 import { ListenerFunction, TListenerFunction } from "./base";
 
-import { sleep } from "../utils/process";
-
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
-declare let _idxUpdateLock: number;
 
 async function updateIndexes(this: TListenerFunction) {
   this.debug("Updating indecies...");
-  while (_idxUpdateLock > 0) {
-    this.debug("Waiting for index update lock release...");
-    this.debug("_idxUpdateLock: ", _idxUpdateLock);
-    await sleep(100);
-  }
-  this.debug("Increasing lock...");
-  _idxUpdateLock++;
   // INFO: Probably rebuilding the entire map is not the efficient way,
   //       but I've struggled to write it differently without introducing
   //       internal structures' consistency bugs...
@@ -31,8 +21,6 @@ async function updateIndexes(this: TListenerFunction) {
     tab.index = realIdx;
     __maps__.updateMap("idxToTab", realIdx, tab);
   }
-  this.debug("Decreasing lock...");
-  _idxUpdateLock--;
 }
 
 Object.setPrototypeOf(updateIndexes, ListenerFunction);

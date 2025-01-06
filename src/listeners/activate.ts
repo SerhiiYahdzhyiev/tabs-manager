@@ -2,12 +2,9 @@ import { Tab } from "../tab";
 import { ITabMaps } from "../interfaces";
 import { ListenerFunction, TListenerFunction } from "./base";
 
-import { sleep } from "../utils/process";
-
 declare const __maps__: ITabMaps;
 declare let _activeId: number;
 declare let __tabs__: Tab[];
-declare let _idxUpdateLock: number;
 
 async function activateListener(
   this: TListenerFunction,
@@ -15,18 +12,10 @@ async function activateListener(
 ) {
   this.debug("Updating active tab...");
 
-  while (_idxUpdateLock > 0) {
-    this.debug("Waiting for indexes update lock release...");
-    this.debug("_idxUpdateLock: ", _idxUpdateLock);
-    await sleep(100);
-  }
-
   this.debug("Current activateId: " + _activeId);
   this.debug("Tab Active info: ");
   this.debug(info);
 
-  this.debug("Increasing lock...");
-  _idxUpdateLock++;
   if (_activeId && _activeId !== info.tabId) {
     const tab = __maps__.getValue<number, Tab>("idToTab", _activeId);
     if (tab) {
@@ -50,8 +39,6 @@ async function activateListener(
       __tabs__[tab.index].active = tab.active = true;
     }
   }
-  this.debug("Decreasing lock...");
-  _idxUpdateLock--;
 }
 
 Object.setPrototypeOf(activateListener, ListenerFunction);

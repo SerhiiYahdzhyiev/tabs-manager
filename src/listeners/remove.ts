@@ -2,6 +2,8 @@ import { Tab } from "../tab";
 import { ITabMaps } from "../interfaces";
 import { ListenerFunction, TListenerFunction } from "./base";
 
+import updateIndexes from "./update-indexes";
+
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
 
@@ -23,6 +25,7 @@ async function removeListener(this: TListenerFunction, id: number) {
     __maps__.updateMap("urlToIds", url, id);
   }
   __maps__.updateMap("idToTab", id, null);
+  await updateIndexes();
 }
 
 Object.setPrototypeOf(removeListener, ListenerFunction);
