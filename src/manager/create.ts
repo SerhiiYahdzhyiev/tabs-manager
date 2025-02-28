@@ -15,6 +15,7 @@ export async function create(...props: Props[]) {
   let ret;
   if (!props?.length) {
     ret = await Browser.getTabs().create({});
+    // TODO: Get rid of sleep...
     await sleep(200);
     return __maps__.getValue(MapName.ID_2_TAB, ret.id);
   }
@@ -23,6 +24,7 @@ export async function create(...props: Props[]) {
 
   if (!(args instanceof Array)) {
     ret = await Browser.getTabs().create(args);
+    // TODO: Get rid of sleep...
     await sleep(200);
     return __maps__.getValue(MapName.ID_2_TAB, ret.id);
   }
@@ -30,6 +32,7 @@ export async function create(...props: Props[]) {
   for (const arg of args) {
     try {
       const ret = await Browser.getTabs().create(arg);
+    // TODO: Get rid of sleep...
       await sleep(200);
       results.push(__maps__.getValue(MapName.ID_2_TAB, ret.id));
     } catch (e) {
