@@ -25,6 +25,14 @@ export class TabsManager implements IVersionable {
     return this.__version__;
   }
 
+  public static withTabs<ReturnType>(
+    cb: <TArgs>(tabs: Tab[], ...args: TArgs[]) => ReturnType,
+  ): <TArgs>(...args: TArgs[]) => ReturnType {
+    return <TArgs>(...args: TArgs[]) => {
+      return cb(__tabs__, ...args);
+    };
+  }
+
   private debug(...args: unknown[]) {
     const _args = [`[${String(this)}]: `, ...args];
     debug(..._args);
@@ -107,13 +115,6 @@ export class TabsManager implements IVersionable {
     });
   }
 
-  public static withTabs<ReturnType>(
-    cb: <TArgs>(tabs: Tab[], ...args: TArgs[]) => ReturnType,
-  ): <TArgs>(...args: TArgs[]) => ReturnType {
-    return <TArgs>(...args: TArgs[]) => {
-      return cb(__tabs__, ...args);
-    };
-  }
 
   public get active(): Tab | null {
     if (_activeId) {
@@ -149,36 +150,8 @@ export class TabsManager implements IVersionable {
     return null;
   }
 
-  private _getTabsByUrl(url: string): Tab[] {
-    try {
-      new URL(url);
-    } catch {
-      console.warn("Invalid url: " + url);
-      return [];
-    }
-    const ids = __maps__.getValue<string, number[]>(MapName.URL_2_IDS, url);
-    if (ids && ids.length) {
-      const result: Tab[] = [];
-      for (const id of ids) {
-        result.push(__maps__.getValue(MapName.ID_2_TAB, id)!);
-      }
-      return result;
-    }
-    return [];
-  }
-
   public has(key: string | number): boolean {
     return this._has(key);
-  }
-
-  private _hasUrl(url: string) {
-    try {
-      new URL(url);
-    } catch {
-      console.warn("Invalid url: " + url);
-      return false;
-    }
-    return __maps__.hasKey(MapName.URL_2_IDS, url);
   }
 
   public _has(key: string | number): boolean {
@@ -196,9 +169,38 @@ export class TabsManager implements IVersionable {
     return false;
   }
 
+  private _hasUrl(url: string) {
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return false;
+    }
+    return __maps__.hasKey(MapName.URL_2_IDS, url);
+  }
+
+
   public focus(tab: Tab): void {
     // TODO: Accept plain tab and wrap it here?
     tab.focus();
+  }
+
+  private _getTabsByUrl(url: string): Tab[] {
+    try {
+      new URL(url);
+    } catch {
+      console.warn("Invalid url: " + url);
+      return [];
+    }
+    const ids = __maps__.getValue<string, number[]>(MapName.URL_2_IDS, url);
+    if (ids && ids.length) {
+      const result: Tab[] = [];
+      for (const id of ids) {
+        result.push(__maps__.getValue(MapName.ID_2_TAB, id)!);
+      }
+      return result;
+    }
+    return [];
   }
 
   public get tabs(): Tab[] {
