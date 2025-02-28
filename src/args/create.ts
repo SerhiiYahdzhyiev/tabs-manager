@@ -1,64 +1,50 @@
-type Props = chrome.tabs.CreateProperties;
+import { getTypes, getWrapper, TWrappersMap } from "./base";
 
-function prepareSingleProp(candidate: unknown): Props | null {
-  switch (typeof candidate) {
-    case "number":
-      return { index: candidate };
-    case "string":
-      if (+candidate) {
-        return { index: +candidate };
-      }
-      try {
-        new URL(candidate);
-        return { url: candidate };
-      } catch {
-        return null;
-      }
-    case "boolean":
-      return { active: candidate };
-  }
-  return candidate as Props;
+const createWrappersMap: TWrappersMap = new Map([
+  [
+    1,
+    new Map<string, CallableFunction>([
+      ["number", (index: number) => ({ index })],
+      [
+        "string",
+        (v: string) => {
+          if (+(v as string)) {
+            return { index: +(v as string) };
+          }
+          return { url: v };
+        },
+      ],
+      ["boolean", (active: boolean) => ({ active })],
+    ]),
+  ],
+  [
+    2,
+    new Map<string, CallableFunction>([
+      ["numberstring", (index: number, url: string) => ({ index, url })],
+      // TODO: Fix potential 0 or negative count
+      [
+        "stringnumber",
+        (url: string, count: number) => new Array(count).fill({ url }),
+      ],
+      [
+        "numberboolean",
+        (index: number, active: boolean) => ({ index, active }),
+      ],
+      [
+        "booleannumber",
+        (active: boolean, index: number) => ({ index, active }),
+      ],
+      ["stringboolean", (url: string, active: boolean) => ({ url, active })],
+      ["booleanstring", (active: boolean, url: boolean) => ({ url, active })],
+    ]),
+  ],
+]);
+
+export default function (...props: unknown[]) {
+  const length = props.length;
+  const types = getTypes(...props);
+
+  const wrapper = getWrapper(createWrappersMap, length, types);
+
+  return wrapper(...props);
 }
-
-function prepare2Props(candidates: [unknown, unknown]) {
-  const types = typeof candidates[0] + typeof candidates[1];
-  let index, url, active;
-  switch (types) {
-    case "numberstring":
-      [index, url] = candidates;
-      return { index, url };
-    case "stringnumber":
-      return new Array(candidates[1]).fill({ url: candidates[0] });
-    case "numberboolean":
-      [index, active] = candidates;
-      return { index, active };
-    case "booleannumber":
-      [active, index] = candidates;
-      return { index, active };
-    case "stringboolean":
-      [url, active] = candidates;
-      return { url, active };
-    case "booleanstring":
-      [active, url] = candidates;
-      return { index, active };
-    default:
-      return null;
-  }
-}
-
-function getCreateArgsFrom(...props: unknown[]) {
-  let candidate;
-  if (props.length === 1) {
-    candidate = prepareSingleProp(props[0]);
-    if (candidate) return candidate as Props;
-    else
-      throw new Error("Invalid argument for TabsManager.create: " + props[0]);
-  }
-  if (props.length === 2) {
-    candidate = prepare2Props(props as [unknown, unknown]);
-    if (candidate) return candidate as Props[];
-  }
-  return props.map(prepareSingleProp) as Props[];
-}
-
-export default getCreateArgsFrom;

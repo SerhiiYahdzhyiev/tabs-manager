@@ -115,7 +115,6 @@ export class TabsManager implements IVersionable {
     });
   }
 
-
   public get active(): Tab | null {
     if (_activeId) {
       return (
@@ -178,7 +177,6 @@ export class TabsManager implements IVersionable {
     }
     return __maps__.hasKey(MapName.URL_2_IDS, url);
   }
-
 
   public focus(tab: Tab): void {
     // TODO: Accept plain tab and wrap it here?

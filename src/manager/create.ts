@@ -1,5 +1,5 @@
 import { Browser } from "../api";
-import { getPropsToArgs } from "../args/index";
+import { getArgs } from "../args/index";
 
 import { ITabMaps } from "../interfaces";
 import { ManipulationName } from "../manipulations/names";
@@ -19,8 +19,7 @@ export async function create(...props: Props[]) {
     await sleep(200);
     return __maps__.getValue(MapName.ID_2_TAB, ret.id);
   }
-  const getArgsFrom = getPropsToArgs(ManipulationName.CREATE)!;
-  const args = getArgsFrom(...props);
+  const args = getArgs(ManipulationName.CREATE, ...props)!;
 
   if (!(args instanceof Array)) {
     ret = await Browser.getTabs().create(args);
@@ -32,7 +31,7 @@ export async function create(...props: Props[]) {
   for (const arg of args) {
     try {
       const ret = await Browser.getTabs().create(arg);
-    // TODO: Get rid of sleep...
+      // TODO: Get rid of sleep...
       await sleep(200);
       results.push(__maps__.getValue(MapName.ID_2_TAB, ret.id));
     } catch (e) {
