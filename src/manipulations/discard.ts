@@ -3,6 +3,8 @@ import { ITabMaps } from "../interfaces";
 import { MapName } from "../maps/map-names";
 import { Browser } from "../api";
 import { TabManipulation, TTabManipulation } from "./base";
+import { updateUrlMaps } from "../maps/upate-url-maps";
+import { Tab } from "../tab";
 
 declare const __maps__: ITabMaps;
 
@@ -12,15 +14,15 @@ function _discard(oldId: number, newId: number) {
   __maps__.updateMap(MapName.ID_2_TAB, newId, tab);
   __maps__.updateMap(MapName.URL_2_IDS, tab.url, oldId);
   __maps__.updateMap(MapName.URL_2_IDS, tab.url, newId);
-  if (tab.host) __maps__.updateMap(MapName.HOST_2_IDS, tab.host, oldId);
-  if (tab.host) __maps__.updateMap(MapName.HOST_2_IDS, tab.host, newId);
 }
 
 async function discard(tabId: number) {
   const tab = await Browser.getTabs().discard(tabId);
 
-  const oldTab = __maps__.getValue(MapName.ID_2_TAB, tabId)!;
+  const oldTab = __maps__.getValue<number, Tab>(MapName.ID_2_TAB, tabId)!;
   _discard(tabId, tab?.id || tabId);
+  updateUrlMaps(oldTab);
+  updateUrlMaps(new Tab(tab));
   Object.assign(oldTab, tab || { discarded: true });
   return oldTab;
 }

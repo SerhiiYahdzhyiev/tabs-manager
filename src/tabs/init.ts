@@ -1,6 +1,7 @@
 import { Browser } from "../api";
 import { ITabMaps } from "../interfaces";
 import { MapName } from "../maps/map-names";
+import { updateUrlMaps } from "../maps/upate-url-maps";
 import { Tab } from "../tab";
 
 declare let __tabs__: Tab[];
@@ -19,11 +20,8 @@ export function initTabs() {
       __maps__.updateMap(MapName.ID_2_TAB, tab.id!, tab);
       __maps__.updateMap(MapName.IDX_2_TAB, tab.index, tab);
       const url = (tab.url || tab.pendingUrl)!;
-      const host = tab.host;
-      if (host) {
-        __maps__.updateMap(MapName.HOST_2_IDS, host, tab.id!);
-      }
       __maps__.updateMap(MapName.URL_2_IDS, url, tab.id!);
+      updateUrlMaps(tab);
     });
   });
 }

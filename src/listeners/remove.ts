@@ -3,28 +3,26 @@ import { ITabMaps } from "../interfaces";
 import { ListenerFunction, TListenerFunction } from "./base";
 
 import updateIndexes from "./update-indexes";
+import { updateUrlMaps } from "../maps/upate-url-maps";
+import { url } from "../utils/url";
+import { MapName } from "../maps/map-names";
 
 declare const __maps__: ITabMaps;
 declare let __tabs__: Tab[];
 
 async function removeListener(this: TListenerFunction, id: number) {
   this.debug("Removed!");
-  const oldTab = __maps__.getValue<number, Tab>("idToTab", id)!;
+  const oldTab = __maps__.getValue<number, Tab>(MapName.ID_2_TAB, id)!;
 
-  const host = oldTab?.host;
-  if (host && __maps__.hasKey("hostToIds", host)) {
-    __maps__.updateMap("hostToIds", host, id);
-  } else {
-    console.warn("Failed to get host of removed tab!");
-  }
+  updateUrlMaps(oldTab);
 
   __tabs__ = __tabs__.filter((t) => t.id !== id);
 
-  const url = (oldTab.url || oldTab.pendingUrl)!;
-  if (__maps__.hasKey("urlToIds", url)) {
-    __maps__.updateMap("urlToIds", url, id);
+  const _url = (oldTab.url || oldTab.pendingUrl)!;
+  if (__maps__.hasKey(MapName.URL_2_IDS, url(_url).href)) {
+    __maps__.updateMap(MapName.URL_2_IDS, url(_url).href, id);
   }
-  __maps__.updateMap("idToTab", id, null);
+  __maps__.updateMap(MapName.ID_2_TAB, id, null);
   await updateIndexes();
 }
 

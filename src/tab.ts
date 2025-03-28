@@ -163,7 +163,7 @@ export class Tab {
 
   private async _update(options: chrome.tabs.UpdateProperties): Promise<Tab> {
     await Browser.getTabs().update(this.id, options);
-    Object.assign(this, options);
+    //Object.assign(this, options);
     return this;
   }
 
@@ -247,7 +247,7 @@ export class Tab {
   }
 
   get searchParams(): URLSearchParams | null {
-    return this.urlObj?.searchParams || null;
+    return this.urlObj?.searchParams ?? null;
   }
 
   get port(): number {
