@@ -4,18 +4,11 @@
   "version": "1.0",
   "description": "An extension to test/inspect TabsManager library during development.",
   "background": {
-    "scripts": [
-      "lib/tabs-manager.js",
-      "background.js"
-    ]
+    "scripts": ["lib/tabs-manager.js", "background.js"]
   },
-  "permissions": [
-    "tabs",
-    "activeTab",
-    "scripting",
-    "debugger"
-  ],
-  "content_scripts": [ {
+  "permissions": ["tabs", "activeTab", "scripting", "debugger"],
+  "content_scripts": [
+    {
       "matches": ["<all_urls>"],
       "js": ["./content.js"]
     }
