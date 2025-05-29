@@ -97,15 +97,16 @@ export class Tab {
   }
 
   public async remove(): Promise<Tab> {
-    return await this.executeManipulation(ManipulationName.REMOVE);
+    return await this._remove();
   }
 
   public async close(): Promise<Tab> {
-    return await this.executeManipulation(ManipulationName.REMOVE);
+    return await this._remove();
   }
 
   public async discard(): Promise<Tab> {
-    const rawTab = await this.executeManipulation(ManipulationName.DISCARD);
+    const tabs = Browser.getTabs();
+    const rawTab = await tabs.discard(this.id);
     Object.assign(this, rawTab || { discarded: true });
     return this;
   }
@@ -156,9 +157,10 @@ export class Tab {
     return Browser.getTabs().connect(this.id, options);
   }
 
-  private async _remove(): Promise<void> {
+  private async _remove(): Promise<Tab> {
     this._removed = true;
     await Browser.getTabs().remove(this.id);
+    return this;
   }
 
   private async _update(options: chrome.tabs.UpdateProperties): Promise<Tab> {
