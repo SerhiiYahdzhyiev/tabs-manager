@@ -3,23 +3,24 @@ import { ITabMaps } from "../interfaces";
 import { MapName } from "../maps/map-names";
 import { Browser } from "../api";
 import { TabManipulation, TTabManipulation } from "./base";
-import { updateUrlMaps } from "../maps/upate-url-maps";
 import { Tab } from "../tab";
 
-declare const __maps__: ITabMaps;
-
-function _discard(oldId: number, newId: number) {
-  const tab = __maps__.getValue<number, TTab>(MapName.ID_2_TAB, oldId)!;
-  __maps__.updateMap(MapName.ID_2_TAB, oldId, null);
-  __maps__.updateMap(MapName.ID_2_TAB, newId, tab);
-  __maps__.updateMap(MapName.URL_2_IDS, tab.url, oldId);
-  __maps__.updateMap(MapName.URL_2_IDS, tab.url, newId);
-}
-
-async function discard(tabId: number) {
+async function discard(
+  tabId: number,
+  __maps__: ITabMaps,
+  updateUrlMaps: (tab: Tab) => void,
+) {
   const tab = await Browser.getTabs().discard(tabId);
 
   const oldTab = __maps__.getValue<number, Tab>(MapName.ID_2_TAB, tabId)!;
+
+  const _discard = (oldId: number, newId: number) => {
+    const tab = __maps__.getValue<number, TTab>(MapName.ID_2_TAB, oldId)!;
+    __maps__.updateMap(MapName.ID_2_TAB, oldId, null);
+    __maps__.updateMap(MapName.ID_2_TAB, newId, tab);
+    __maps__.updateMap(MapName.URL_2_IDS, tab.url, oldId);
+    __maps__.updateMap(MapName.URL_2_IDS, tab.url, newId);
+  };
   _discard(tabId, tab?.id || tabId);
   updateUrlMaps(oldTab);
   updateUrlMaps(new Tab(tab));
