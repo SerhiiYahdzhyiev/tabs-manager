@@ -5,7 +5,7 @@ import { simpleOneToOneMapUpdater, stringToIdsMapUpdater } from "./updaters";
 import { MapName } from "./map-names";
 import { urlKeys } from "./url-keys";
 
-export function initMaps() {
+export function getMaps() {
   const _urlToIds = new Map<string, number[]>();
 
   const _idToTab = new Map<number, Tab>();
@@ -42,5 +42,5 @@ export function initMaps() {
     );
   }
 
-  Object.assign(globalThis, { __maps__: maps });
+return maps;
 }

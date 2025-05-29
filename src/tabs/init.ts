@@ -4,11 +4,10 @@ import { MapName } from "../maps/map-names";
 import { updateUrlMaps } from "../maps/upate-url-maps";
 import { Tab } from "../tab";
 
-declare let __tabs__: Tab[];
 declare let _activeId: number; // eslint-disable-line
-declare const __maps__: ITabMaps;
+declare let __initialized__: boolean;
 
-export function initTabs() {
+export function initTabs(__tabs__: Tab[], __maps__: ITabMaps) {
   const tabs = Browser.getTabs();
 
   tabs.query({}, (tabs: chrome.tabs.Tab[]) => {
@@ -22,6 +21,7 @@ export function initTabs() {
       const url = (tab.url || tab.pendingUrl)!;
       __maps__.updateMap(MapName.URL_2_IDS, url, tab.id!);
       updateUrlMaps(tab);
+      __initialized__ = true;
     });
   });
 }

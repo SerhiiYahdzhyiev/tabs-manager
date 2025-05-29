@@ -1,4 +1,4 @@
-import { TabsMapUpdater, TabsMap } from "./types";
+import { TabsMapUpdater, TabsMap, Listener } from "./types";
 
 export interface IVersionable {
   version: string;
@@ -15,4 +15,11 @@ export interface ITabMaps {
     mapName: string,
     updater: TabsMapUpdater<MapType, K, V>,
   ) => void;
+}
+
+export interface IListeners {
+  entries: () => MapIterator<[string, Listener]>;
+  register: (name: string, listener: Listener) => void;
+  init: () => void;
+  destroy: () => void;
 }

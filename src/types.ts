@@ -21,3 +21,6 @@ export type TabsMapUpdater<MapType, K, V> = (
 export type TTab = chrome.tabs.Tab & {
   host: string;
 };
+
+// TODO: Resolve with better typehint.
+export type Listener = CallableFunction;
