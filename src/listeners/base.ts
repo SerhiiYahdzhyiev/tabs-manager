@@ -1,38 +1,83 @@
-import { debug } from "../utils/logging";
+import { Browser } from "../api";
+import { Listener } from "../types";
+import { IListeners } from "../interfaces";
 
-enum ListenerName {
-  ACTIVATED = "activateListener",
-  CREATED = "createListener",
-  UPDATED = "updateListener",
-  REMOVE = "removeListener",
-  UPD_IDX = "updateIndexes",
-  CLEAN_HOSTS = "cleanHostsMap",
+function getAPIListenerNamesFrom(name: string): string[] {
+  switch (name) {
+    case "activate":
+      return ["onActivated"];
+    case "create":
+      return ["onCreated"];
+    case "move":
+      return ["onMoved"];
+    case "remove":
+      return ["onRemoved"];
+    case "update":
+      return ["onUpdated"];
+    case "claenUrlMaps":
+      return ["onRemoved", "onUpdated"];
+    default:
+      return [];
+  }
 }
 
-function getPrefixStyles(name: ListenerName) {
-  const colors = {
-    // TODO: Refine colors...
-    [ListenerName.ACTIVATED]: "darkorange",
-    [ListenerName.CREATED]: "green",
-    [ListenerName.UPDATED]: "yellow",
-    [ListenerName.REMOVE]: "red",
-    [ListenerName.UPD_IDX]: "cyan",
-    [ListenerName.CLEAN_HOSTS]: "teal",
-  };
+export class Listeners implements IListeners {
+  private _items: Map<string, Listener>;
+  private __initialized__: boolean = false;
 
-  return `color:${colors[name] || "darkorange"};font-wieght:bold`;
+  public entries() {
+    return this._items.entries();
+  }
+
+  public get initialized(): boolean {
+    return this.__initialized__;
+  }
+
+  public register(name: string, listener: Listener) {
+    this._items.set(name, listener);
+  }
+
+  public init(): void {
+    for (const [name, listener] of this._items.entries()) {
+      const tabs = Browser.getTabs();
+      const _names: string[] = getAPIListenerNamesFrom(name);
+      if (_names.length) {
+        for (const name of _names) {
+          (
+            tabs as unknown as Record<
+              string,
+              {
+                addListener: (listener: CallableFunction) => void;
+              }
+            >
+          )[name].addListener(listener);
+        }
+      }
+    }
+    this.__initialized__ = true;
+  }
+
+  public destroy() {
+    const tabs = Browser.getTabs();
+    for (const [name, listener] of this._items.entries()) {
+      const _names: string[] = getAPIListenerNamesFrom(name);
+      if (_names.length) {
+        for (const name of _names) {
+          (
+            tabs as unknown as Record<
+              string,
+              {
+                removeListener: (listener: CallableFunction) => void;
+              }
+            >
+          )[name].removeListener(listener);
+        }
+      }
+    }
+    this.__initialized__ = false;
+  }
+
+  constructor() {
+    this._items = new Map<string, Listener>();
+  }
 }
-
-export type TListenerFunction = typeof Function & {
-  debug: (...args: unknown[]) => void;
-};
-
-export const ListenerFunction: TListenerFunction = Object.create(
-  Function.prototype,
-);
-
-ListenerFunction.debug = function (...args: unknown[]) {
-  const prefix = "%c[" + this.name + "]: ";
-  const _args = [prefix, getPrefixStyles(this.name as ListenerName), ...args];
-  debug(..._args);
-};

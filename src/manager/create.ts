@@ -1,7 +1,6 @@
 import { Browser } from "../api";
 import { getArgs } from "../args/index";
 
-import { ITabMaps } from "../interfaces";
 import { ManipulationName } from "../manipulations/names";
 import { MapName } from "../maps/map-names";
 
@@ -9,15 +8,14 @@ import { sleep } from "../utils/process";
 
 type Props = chrome.tabs.CreateProperties;
 
-declare let __maps__: ITabMaps;
-
 export async function create(...props: Props[]) {
   let ret;
   if (!props?.length) {
     ret = await Browser.getTabs().create({});
     // TODO: Get rid of sleep...
     await sleep(200);
-    return __maps__.getValue(MapName.ID_2_TAB, ret.id);
+    //@ts-expect-error INFO: this -> TabsManager instance
+    return this._maps.getValue(MapName.ID_2_TAB, ret.id);
   }
   const args = getArgs(ManipulationName.CREATE, ...props)!;
 
@@ -25,7 +23,8 @@ export async function create(...props: Props[]) {
     ret = await Browser.getTabs().create(args);
     // TODO: Get rid of sleep...
     await sleep(200);
-    return __maps__.getValue(MapName.ID_2_TAB, ret.id);
+    //@ts-expect-error INFO: this -> TabsManager instance
+    return this._maps.getValue(MapName.ID_2_TAB, ret.id);
   }
   const results = [];
   for (const arg of args) {
@@ -33,7 +32,8 @@ export async function create(...props: Props[]) {
       const ret = await Browser.getTabs().create(arg);
       // TODO: Get rid of sleep...
       await sleep(200);
-      results.push(__maps__.getValue(MapName.ID_2_TAB, ret.id));
+      //@ts-expect-error INFO: this -> TabsManager instance
+      results.push(this._maps.getValue(MapName.ID_2_TAB, ret.id));
     } catch (e) {
       console.warn(e);
       continue;
