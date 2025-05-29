@@ -10,12 +10,13 @@
     "transpile": "tsc",
     "bundle": "rollup -c ./rollup.config.js --environment BUILD:prod",
     "bundle:dev": "rollup -c ./rollup.config.js",
-    "build:dev": "npm-run-all -s clean transpile bundle:dev",
-    "build": "npm-run-all -s clean transpile bundle",
+    "build:dev": "npm-run-all -s clean transpile bundle:dev update",
+    "build": "npm-run-all -s clean transpile bundle update",
     "format": "prettier src/ --write",
     "format:test": "prettier __test__ --write",
     "test": "vitest run __test__",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "update": "scripts/update_test_extensions.sh"
   },
   "keywords": [
     "library",
