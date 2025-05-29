@@ -5,6 +5,10 @@ export class TabMaps implements ITabMaps {
   private _maps = new Map();
   private _updaters = new Map();
 
+  public get size() {
+    return this._maps.size;
+  }
+
   private _updateMap<K, V>(
     map: TabsMap<K, V>,
     updater: TabsMapUpdater<TabsMap<K, V>, K, V>,
