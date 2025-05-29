@@ -42,5 +42,5 @@ export function getMaps() {
     );
   }
 
-return maps;
+  return maps;
 }
